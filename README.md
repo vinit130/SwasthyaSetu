@@ -1,5 +1,8 @@
-﻿# SwasthyaSetu (स्वास्थ्यसेतु)
+# SwasthyaSetu (स्वास्थ्यसेतु)
 > **"Connecting Rural Healthcare from Village to Follow-up"**
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/vinit130/SwasthyaSetu)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vinit130/SwasthyaSetu)
 
 SwasthyaSetu is an enterprise-grade rural healthcare coordination platform that connects ASHA/ANM frontline workers, qualified doctors, and rural households with a unified longitudinal patient journey.
 
