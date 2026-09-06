@@ -4,7 +4,7 @@
   "description": "Connecting Rural Healthcare from Village to Follow-up",
   "scripts": {
     "install:server": "npm install --prefix server",
-    "install:client": "npm install --prefix client",
+    "install:client": "npm install --prefix client --include=dev",
     "install:all": "npm run install:server && npm run install:client",
     "seed": "npm run seed --prefix server",
     "test:verify": "node server/utils/verifyWorkflow.js",
