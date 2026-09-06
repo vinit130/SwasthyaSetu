@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 48" fill="none">
+  <defs>
+    <linearGradient id="logo-teal-grad" x1="2" y1="2" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#0d9488" />
+    </linearGradient>
+    <linearGradient id="logo-emerald-grad" x1="12" y1="28" x2="36" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#14b8a6" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+
+  <!-- Mark Container -->
+  <g transform="translate(2, 2)">
+    <rect width="44" height="44" rx="12" fill="url(#logo-teal-grad)" />
+
+    <!-- Bridge Arch Pathway -->
+    <path
+      d="M8 35 C16 23, 32 23, 40 35"
+      stroke="#ffffff"
+      stroke-opacity="0.35"
+      stroke-width="3"
+      stroke-linecap="round"
+    />
+    <path
+      d="M10 37 C18 27, 30 27, 38 37"
+      stroke="url(#logo-emerald-grad)"
+      stroke-width="2.5"
+      stroke-linecap="round"
+    />
+
+    <!-- Healthcare Medical Cross with Heartbeat Wave -->
+    <rect x="21.5" y="10" width="5" height="18" rx="2.5" fill="#ffffff" />
+    <path
+      d="M12 19 L19 19 L21.5 13 L24 24 L26.5 17 L29 19 L36 19"
+      stroke="#ffffff"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <circle cx="24" cy="31" r="2.5" fill="#ffffff" />
+  </g>
+
+  <!-- Wordmark Text -->
+  <g transform="translate(56, 31)">
+    <text
+      font-family="system-ui, -apple-system, 'Inter', 'Segoe UI', sans-serif"
+      font-size="22"
+      font-weight="800"
+      letter-spacing="-0.5"
+    >
+      <tspan fill="#0f172a">Swasthya</tspan>
+      <tspan fill="#0d9488">Setu</tspan>
+    </text>
+  </g>
+
+  <!-- Tagline Text -->
+  <g transform="translate(57, 43)">
+    <text
+      font-family="system-ui, -apple-system, 'Inter', 'Segoe UI', sans-serif"
+      font-size="8.5"
+      font-weight="600"
+      fill="#64748b"
+      letter-spacing="0.2"
+    >
+      RURAL HEALTHCARE CONTINUUM
+    </text>
+  </g>
+</svg>

@@ -1,0 +1,19 @@
+{
+  "name": "swasthyasetu-monorepo",
+  "version": "1.0.0",
+  "description": "Connecting Rural Healthcare from Village to Follow-up",
+  "scripts": {
+    "install:server": "npm install --prefix server",
+    "install:client": "npm install --prefix client",
+    "install:all": "npm run install:server && npm run install:client",
+    "seed": "npm run seed --prefix server",
+    "test:verify": "node server/utils/verifyWorkflow.js",
+    "server": "npm start --prefix server",
+    "client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "start": "node server/server.js"
+  },
+  "devDependencies": {
+    "localtunnel": "^2.0.2"
+  }
+}
