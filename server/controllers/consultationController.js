@@ -1,12 +1,17 @@
+const mongoose = require('mongoose');
 const Consultation = require('../models/Consultation');
 const Patient = require('../models/Patient');
 const Visit = require('../models/Visit');
 const Followup = require('../models/Followup');
+const mockStore = require('../utils/mockStore');
 
 // @desc    Get consultations for a patient
 // @route   GET /api/patients/:id/consultations
 // @access  Private
 exports.getConsultationsByPatient = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.getConsultationsByPatient(req, res);
+  }
   try {
     const consultations = await Consultation.find({ patientId: req.params.id })
       .populate('doctorId', 'name role')
@@ -27,6 +32,9 @@ exports.getConsultationsByPatient = async (req, res, next) => {
 // @route   POST /api/patients/:id/consultations
 // @access  Private (DOCTOR ONLY)
 exports.createConsultation = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.createConsultation(req, res);
+  }
   try {
     const {
       visitId,

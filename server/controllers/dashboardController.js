@@ -1,13 +1,18 @@
+const mongoose = require('mongoose');
 const Patient = require('../models/Patient');
 const Visit = require('../models/Visit');
 const Consultation = require('../models/Consultation');
 const Referral = require('../models/Referral');
 const Followup = require('../models/Followup');
+const mockStore = require('../utils/mockStore');
 
 // @desc    Get ASHA Worker Dashboard summary & lists
 // @route   GET /api/dashboard/asha
 // @access  Private (ASHA ONLY)
 exports.getAshaDashboard = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.getAshaDashboard(req, res);
+  }
   try {
     const totalPatients = await Patient.countDocuments();
     const pendingReferralsCount = await Referral.countDocuments({
@@ -88,6 +93,9 @@ exports.getAshaDashboard = async (req, res, next) => {
 // @route   GET /api/dashboard/doctor
 // @access  Private (DOCTOR ONLY)
 exports.getDoctorDashboard = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.getDoctorDashboard(req, res);
+  }
   try {
     // Patients requiring review (Visits with status PENDING_REVIEW or high/medium risk)
     const pendingReviewVisits = await Visit.find({

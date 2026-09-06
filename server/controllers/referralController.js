@@ -1,10 +1,15 @@
+const mongoose = require('mongoose');
 const Referral = require('../models/Referral');
 const Patient = require('../models/Patient');
+const mockStore = require('../utils/mockStore');
 
 // @desc    Get all referrals with filter
 // @route   GET /api/referrals
 // @access  Private (ASHA & DOCTOR)
 exports.getReferrals = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.getReferrals(req, res);
+  }
   try {
     const { status, priority, search } = req.query;
     const query = {};
@@ -46,6 +51,9 @@ exports.getReferrals = async (req, res, next) => {
 // @route   GET /api/referrals/:id
 // @access  Private
 exports.getReferralById = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.getReferralById(req, res);
+  }
   try {
     const referral = await Referral.findById(req.params.id)
       .populate('patientId')
@@ -72,6 +80,9 @@ exports.getReferralById = async (req, res, next) => {
 // @route   POST /api/referrals
 // @access  Private (DOCTOR ONLY)
 exports.createReferral = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.createReferral(req, res);
+  }
   try {
     const {
       patientId,
@@ -135,6 +146,9 @@ exports.createReferral = async (req, res, next) => {
 // @route   PUT /api/referrals/:id/status
 // @access  Private (ASHA & DOCTOR)
 exports.updateReferralStatus = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.updateReferralStatus(req, res);
+  }
   try {
     const { status, note } = req.body;
     const allowed = ['CREATED', 'ACCEPTED', 'PATIENT ARRIVED', 'COMPLETED'];

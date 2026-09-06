@@ -31,9 +31,13 @@ app.use(
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const mongoose = require('mongoose');
+  const isConnected = mongoose.connection.readyState === 1;
   res.status(200).json({
     status: 'ok',
     project: 'SwasthyaSetu Rural Healthcare Platform',
+    database: isConnected ? 'Connected (MongoDB)' : 'In-Memory Demo Mode',
+    dbReadyState: mongoose.connection.readyState,
     timestamp: new Date().toISOString(),
   });
 });

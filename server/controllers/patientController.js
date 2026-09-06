@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Patient = require('../models/Patient');
 const Visit = require('../models/Visit');
 const Consultation = require('../models/Consultation');
@@ -5,11 +6,15 @@ const Referral = require('../models/Referral');
 const Followup = require('../models/Followup');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const mockStore = require('../utils/mockStore');
 
 // @desc    Get all patients with search & risk filter
 // @route   GET /api/patients
 // @access  Private (ASHA & DOCTOR)
 exports.getPatients = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.getPatients(req, res);
+  }
   try {
     const { search, risk, village, page = 1, limit = 50 } = req.query;
     const query = {};
@@ -108,6 +113,9 @@ exports.getPatients = async (req, res, next) => {
 // @route   POST /api/patients/check-duplicate
 // @access  Private
 exports.checkDuplicate = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.checkDuplicate(req, res);
+  }
   try {
     const { name, phone, age } = req.body;
 
@@ -143,6 +151,9 @@ exports.checkDuplicate = async (req, res, next) => {
 // @route   POST /api/patients
 // @access  Private (ASHA & DOCTOR)
 exports.createPatient = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.createPatient(req, res);
+  }
   try {
     const {
       name,
@@ -256,6 +267,9 @@ exports.createPatient = async (req, res, next) => {
 // @route   GET /api/patients/:id
 // @access  Private
 exports.getPatientById = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.getPatientById(req, res);
+  }
   try {
     // Enforce patient data isolation
     if (req.user.role === 'PATIENT' && req.user.patientId?.toString() !== req.params.id) {
@@ -414,6 +428,9 @@ exports.getPatientById = async (req, res, next) => {
 // @route   POST /api/patients/:id/risk-assessment
 // @access  Private (DOCTOR ONLY)
 exports.assessRiskByDoctor = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.assessRiskByDoctor(req, res);
+  }
   try {
     const { riskLevel, riskReason, reason, visitId } = req.body;
     const finalReason = riskReason || reason || '';
@@ -481,6 +498,9 @@ exports.assessRiskByDoctor = async (req, res, next) => {
 // @route   GET /api/patients/me/journey
 // @access  Private (PATIENT ONLY)
 exports.getPatientJourney = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.getPatientJourney(req, res);
+  }
   try {
     if (req.user.role !== 'PATIENT' || !req.user.patientId) {
       return res.status(403).json({
@@ -624,6 +644,9 @@ exports.getPatientJourney = async (req, res, next) => {
 // @route   PUT /api/patients/:id
 // @access  Private (ASHA & DOCTOR)
 exports.updatePatient = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.updatePatient(req, res);
+  }
   try {
     const patient = await Patient.findByIdAndUpdate(req.params.id, req.body, {
       new: true,

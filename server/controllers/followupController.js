@@ -1,10 +1,15 @@
+const mongoose = require('mongoose');
 const Followup = require('../models/Followup');
 const Patient = require('../models/Patient');
+const mockStore = require('../utils/mockStore');
 
 // @desc    Get all follow-ups with filters
 // @route   GET /api/followups
 // @access  Private (ASHA & DOCTOR)
 exports.getFollowups = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.getFollowups(req, res);
+  }
   try {
     const { status, search } = req.query;
     const query = {};
@@ -44,6 +49,9 @@ exports.getFollowups = async (req, res, next) => {
 // @route   POST /api/followups
 // @access  Private (DOCTOR ONLY)
 exports.createFollowup = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.createFollowup(req, res);
+  }
   try {
     const { patientId, date, dueDate, instructions, notes } = req.body;
     const targetDate = date || dueDate;
@@ -91,6 +99,9 @@ exports.createFollowup = async (req, res, next) => {
 // @route   PUT /api/followups/:id
 // @access  Private (ASHA & DOCTOR)
 exports.updateFollowup = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.updateFollowup(req, res);
+  }
   try {
     const { status, notes } = req.body;
     const allowed = ['PENDING', 'COMPLETED', 'MISSED'];
