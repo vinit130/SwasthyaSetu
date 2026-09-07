@@ -13,6 +13,8 @@ import {
   User,
   CheckCircle2,
   Wifi,
+  WifiOff,
+  Building,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -34,6 +36,28 @@ export default function LoginPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
+  const navigateByRole = (role) => {
+    switch (role) {
+      case 'ASHA':
+        navigate('/asha/dashboard');
+        break;
+      case 'DOCTOR':
+        navigate('/doctor/dashboard');
+        break;
+      case 'PATIENT':
+        navigate('/patient/dashboard');
+        break;
+      case 'HEALTH_DEPARTMENT_ADMIN':
+        navigate('/admin/dashboard');
+        break;
+      case 'DISTRICT_HOSPITAL':
+        navigate('/hospital/dashboard');
+        break;
+      default:
+        navigate('/');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -46,15 +70,7 @@ export default function LoginPage() {
     try {
       setLoading(true);
       const loggedInUser = await login(email, password);
-      if (loggedInUser.role === 'ASHA') {
-        navigate('/asha/dashboard');
-      } else if (loggedInUser.role === 'DOCTOR') {
-        navigate('/doctor/dashboard');
-      } else if (loggedInUser.role === 'PATIENT') {
-        navigate('/patient/dashboard');
-      } else {
-        navigate('/');
-      }
+      navigateByRole(loggedInUser.role);
     } catch (err) {
       console.error(err);
       setError(
@@ -74,19 +90,26 @@ export default function LoginPage() {
     try {
       setLoading(true);
       const loggedInUser = await login(demoEmail, 'Demo@123');
-      if (loggedInUser.role === 'ASHA') {
-        navigate('/asha/dashboard');
-      } else if (loggedInUser.role === 'DOCTOR') {
-        navigate('/doctor/dashboard');
-      } else if (loggedInUser.role === 'PATIENT') {
-        navigate('/patient/dashboard');
-      } else {
-        navigate('/');
-      }
+      navigateByRole(loggedInUser.role);
     } catch (err) {
       setError(err.response?.data?.message || 'Demo login failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOfflineEntry = () => {
+    const storedUser = localStorage.getItem('swasthyasetu_user');
+    const token = localStorage.getItem('swasthyasetu_token');
+    if (storedUser && token) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        navigateByRole(parsed.role);
+      } catch (e) {
+        setError('Offline session corrupted. Please sign in online once to re-authenticate.');
+      }
+    } else {
+      setError('Offline Mode requires at least one prior authenticated session on this device to protect patient records.');
     }
   };
 
@@ -245,53 +268,93 @@ export default function LoginPage() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                 <button
                   type="button"
                   onClick={() => handleDemoLogin('asha@demo.com')}
                   disabled={loading}
-                  className="p-3 text-left rounded-xl border-2 border-teal-200/90 dark:border-teal-800 bg-teal-50/60 dark:bg-teal-950/40 hover:bg-teal-100/70 dark:hover:bg-teal-900/50 hover:border-teal-400 dark:hover:border-teal-600 transition-all focus:ring-2 focus:ring-teal-600 shadow-2xs"
+                  className="p-2.5 text-left rounded-xl border-2 border-teal-200/90 dark:border-teal-800 bg-teal-50/60 dark:bg-teal-950/40 hover:bg-teal-100/70 dark:hover:bg-teal-900/50 hover:border-teal-400 dark:hover:border-teal-600 transition-all focus:ring-2 focus:ring-teal-600 shadow-2xs"
                 >
                   <div className="flex items-center gap-1.5 text-teal-900 dark:text-teal-200 font-bold text-xs mb-1">
                     <UserCheck className="w-4 h-4 text-teal-700 dark:text-teal-400" />
-                    <span>{t('demoAshaRole')}</span>
+                    <span>{t('demoAshaRole') || 'ASHA / ANM'}</span>
                   </div>
                   <p className="text-[10px] text-teal-700 dark:text-teal-400 truncate font-mono">asha@demo.com</p>
-                  <p className="text-[10px] font-semibold text-teal-600 dark:text-teal-400 mt-0.5">{t('demoAshaSub')}</p>
+                  <p className="text-[10px] font-semibold text-teal-600 dark:text-teal-400 mt-0.5">{t('demoAshaSub') || 'Frontline Screening'}</p>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleDemoLogin('doctor@demo.com')}
                   disabled={loading}
-                  className="p-3 text-left rounded-xl border-2 border-indigo-200/90 dark:border-indigo-800 bg-indigo-50/60 dark:bg-indigo-950/40 hover:bg-indigo-100/70 dark:hover:bg-indigo-900/50 hover:border-indigo-400 dark:hover:border-indigo-600 transition-all focus:ring-2 focus:ring-indigo-600 shadow-2xs"
+                  className="p-2.5 text-left rounded-xl border-2 border-indigo-200/90 dark:border-indigo-800 bg-indigo-50/60 dark:bg-indigo-950/40 hover:bg-indigo-100/70 dark:hover:bg-indigo-900/50 hover:border-indigo-400 dark:hover:border-indigo-600 transition-all focus:ring-2 focus:ring-indigo-600 shadow-2xs"
                 >
                   <div className="flex items-center gap-1.5 text-indigo-900 dark:text-indigo-200 font-bold text-xs mb-1">
                     <Stethoscope className="w-4 h-4 text-indigo-700 dark:text-indigo-400" />
-                    <span>{t('demoDoctorRole')}</span>
+                    <span>{t('demoDoctorRole') || 'Doctor'}</span>
                   </div>
                   <p className="text-[10px] text-indigo-800 dark:text-indigo-400 truncate font-mono">doctor@demo.com</p>
-                  <p className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">{t('demoDoctorSub')}</p>
+                  <p className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">{t('demoDoctorSub') || 'Clinical Reviews'}</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('hospital@demo.com')}
+                  disabled={loading}
+                  className="p-2.5 text-left rounded-xl border-2 border-rose-200/90 dark:border-rose-800 bg-rose-50/60 dark:bg-rose-950/40 hover:bg-rose-100/70 dark:hover:bg-rose-900/50 hover:border-rose-400 dark:hover:border-rose-600 transition-all focus:ring-2 focus:ring-rose-600 shadow-2xs"
+                >
+                  <div className="flex items-center gap-1.5 text-rose-900 dark:text-rose-200 font-bold text-xs mb-1">
+                    <Building className="w-4 h-4 text-rose-700 dark:text-rose-400" />
+                    <span>{t('demoHospitalRole') || 'District Hospital'}</span>
+                  </div>
+                  <p className="text-[10px] text-rose-800 dark:text-rose-400 truncate font-mono">hospital@demo.com</p>
+                  <p className="text-[10px] font-semibold text-rose-600 dark:text-rose-400 mt-0.5">{t('demoHospitalSub') || 'Admissions & Beds'}</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('admin@demo.com')}
+                  disabled={loading}
+                  className="p-2.5 text-left rounded-xl border-2 border-blue-200/90 dark:border-blue-800 bg-blue-50/60 dark:bg-blue-950/40 hover:bg-blue-100/70 dark:hover:bg-blue-900/50 hover:border-blue-400 dark:hover:border-blue-600 transition-all focus:ring-2 focus:ring-blue-600 shadow-2xs"
+                >
+                  <div className="flex items-center gap-1.5 text-blue-900 dark:text-blue-200 font-bold text-xs mb-1">
+                    <ShieldCheck className="w-4 h-4 text-blue-700 dark:text-blue-400" />
+                    <span>{t('demoAdminRole') || 'Health Admin'}</span>
+                  </div>
+                  <p className="text-[10px] text-blue-800 dark:text-blue-400 truncate font-mono">admin@demo.com</p>
+                  <p className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 mt-0.5">{t('demoAdminSub') || 'State Surveillance'}</p>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleDemoLogin('patient@demo.com')}
                   disabled={loading}
-                  className="p-3 text-left rounded-xl border-2 border-emerald-200/90 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/40 hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 hover:border-emerald-400 dark:hover:border-emerald-600 transition-all focus:ring-2 focus:ring-emerald-600 shadow-2xs"
+                  className="p-2.5 text-left rounded-xl border-2 border-emerald-200/90 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/40 hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 hover:border-emerald-400 dark:hover:border-emerald-600 transition-all focus:ring-2 focus:ring-emerald-600 shadow-2xs sm:col-span-2 lg:col-span-1"
                 >
                   <div className="flex items-center gap-1.5 text-emerald-900 dark:text-emerald-200 font-bold text-xs mb-1">
                     <User className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
-                    <span>{t('demoPatientRole')}</span>
+                    <span>{t('demoPatientRole') || 'Patient'}</span>
                   </div>
                   <p className="text-[10px] text-emerald-800 dark:text-emerald-400 truncate font-mono">patient@demo.com</p>
-                  <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">{t('demoPatientSub')}</p>
+                  <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">{t('demoPatientSub') || 'Care Journey'}</p>
                 </button>
               </div>
 
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-3 font-medium">
-                {t('demoPasswordNotice')} <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono text-slate-700 dark:text-slate-300">Demo@123</code>
-              </p>
+              <div className="mt-3.5 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium text-center sm:text-left">
+                  {t('demoPasswordNotice') || 'Password for demo accounts:'} <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono text-slate-700 dark:text-slate-300">Demo@123</code>
+                </p>
+
+                <button
+                  type="button"
+                  onClick={handleOfflineEntry}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-[11px] font-semibold transition-all shadow-2xs"
+                  title="Open offline workspace using previously authenticated local session"
+                >
+                  <WifiOff className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span>{t('launchOfflineMode') || 'Offline Field Mode'}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

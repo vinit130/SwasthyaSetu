@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Referral = require('../models/Referral');
 const Patient = require('../models/Patient');
 const mockStore = require('../utils/mockStore');
+const { generateReferralToken } = require('../utils/validators');
 
 // @desc    Get all referrals with filter
 // @route   GET /api/referrals
@@ -32,6 +33,7 @@ exports.getReferrals = async (req, res, next) => {
         (r) =>
           (r.patientId && searchRegex.test(r.patientId.name)) ||
           (r.patientId && searchRegex.test(r.patientId.patientId)) ||
+          (r.referralToken && searchRegex.test(r.referralToken)) ||
           searchRegex.test(r.facility) ||
           searchRegex.test(r.department)
       );
@@ -41,6 +43,36 @@ exports.getReferrals = async (req, res, next) => {
       success: true,
       count: referrals.length,
       data: referrals,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get referral by token
+// @route   GET /api/referrals/token/:token
+// @access  Private
+exports.getReferralByToken = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return mockStore.getReferralByToken(req, res);
+  }
+  try {
+    const token = req.params.token.toUpperCase().trim();
+    const referral = await Referral.findOne({ referralToken: token })
+      .populate('patientId')
+      .populate('doctorId', 'name role phone')
+      .populate('statusHistory.updatedBy', 'name role');
+
+    if (!referral) {
+      return res.status(404).json({
+        success: false,
+        message: `Referral token '${token}' not found`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: referral,
     });
   } catch (error) {
     next(error);
@@ -108,9 +140,12 @@ exports.createReferral = async (req, res, next) => {
       });
     }
 
+    const token = generateReferralToken();
+
     const referral = new Referral({
       patientId,
       doctorId: req.user._id,
+      referralToken: token,
       reason,
       facility,
       department,

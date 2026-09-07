@@ -69,6 +69,7 @@ export const consultationAPI = {
 export const referralAPI = {
   getReferrals: (params) => api.get('/referrals', { params }),
   getReferralById: (id) => api.get(`/referrals/${id}`),
+  getReferralByToken: (token) => api.get(`/referrals/token/${token}`),
   createReferral: (data) => api.post('/referrals', data),
   updateStatus: (id, statusData) => api.put(`/referrals/${id}/status`, statusData),
 };
@@ -82,6 +83,39 @@ export const followupAPI = {
 export const dashboardAPI = {
   getAshaDashboard: () => api.get('/dashboard/asha'),
   getDoctorDashboard: () => api.get('/dashboard/doctor'),
+};
+
+export const healthAdminAPI = {
+  getOverview: () => api.get('/admin/overview'),
+  getFacilities: (params) => api.get('/admin/facilities', { params }),
+  getSurveillance: () => api.get('/admin/surveillance'),
+  getAuditLogs: (params) => api.get('/admin/audit-logs', { params }),
+};
+
+export const hospitalAPI = {
+  getReferrals: (params) => api.get('/hospital/referrals', { params }),
+  getReferralByToken: (token) => api.get(`/hospital/referral-token/${token}`),
+  emergencyLookup: (data) => api.post('/hospital/emergency-lookup', data),
+  getEncounters: (params) => api.get('/hospital/encounters', { params }),
+  createEncounter: (data) => api.post('/hospital/encounters', data),
+  getBeds: (params) => api.get('/hospital/beds', { params }),
+  updateBed: (id, data) => api.put(`/hospital/beds/${id}`, data),
+};
+
+export const inventoryAPI = {
+  getInventory: (params) => api.get('/inventory', { params }),
+  createMovement: (data) => api.post('/inventory/movements', data),
+};
+
+export const documentAPI = {
+  getPatientDocuments: (patientId) => api.get(`/documents/patient/${patientId}`),
+  uploadDocument: (data) => api.post('/documents', data),
+  viewDocument: (id) => api.get(`/documents/${id}/view`),
+};
+
+export const facilityAPI = {
+  getAllFacilities: (params) => api.get('/facilities', { params }),
+  getNearbyFacilities: (params) => api.get('/facilities/nearby', { params }),
 };
 
 export default api;

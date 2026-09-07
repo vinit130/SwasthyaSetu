@@ -21,6 +21,8 @@ import Input from '../../components/common/Input';
 import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
 import { validatePhone } from '../../utils/formatters';
+import { validateIndianPhone } from '../../utils/validators';
+import VoiceInputButton from '../../components/common/VoiceInputButton';
 import { storage } from '../../utils/storage';
 
 export default function RegisterPatient() {
@@ -36,9 +38,9 @@ export default function RegisterPatient() {
     gender: 'Male',
     phone: '',
     address: '',
-    village: 'Demo Village',
-    district: 'Demo District',
-    state: 'West Bengal',
+    village: 'Shirur',
+    district: 'Pune',
+    state: 'Maharashtra',
     emergencyContact: '',
     bloodGroup: 'Unknown',
     allergies: '',
@@ -89,8 +91,9 @@ export default function RegisterPatient() {
     if (!formData.age || Number(formData.age) < 0 || Number(formData.age) > 130) {
       errs.age = 'Please enter a valid age (0-130)';
     }
-    const phoneErr = validatePhone(formData.phone);
-    if (phoneErr) errs.phone = phoneErr;
+    if (!formData.phone || !validateIndianPhone(formData.phone)) {
+      errs.phone = 'Valid 10-digit Indian mobile number required (starting with 6, 7, 8, or 9)';
+    }
     if (!formData.village.trim()) errs.village = 'Village name is required';
     if (!formData.district.trim()) errs.district = 'District is required';
 
@@ -357,16 +360,21 @@ export default function RegisterPatient() {
             <span>{t('sectionPersonalInfo')}</span>
           </h2>
 
-          <Input
-            label={t('fullName')}
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            onBlur={handleCheckDuplicate}
-            placeholder={t('fullNamePlaceholder')}
-            error={errors.name}
-            required
-          />
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-700">{t('fullName')} *</label>
+              <VoiceInputButton onTranscript={(txt) => setFormData((prev) => ({ ...prev, name: prev.name ? `${prev.name} ${txt}` : txt }))} />
+            </div>
+            <Input
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              onBlur={handleCheckDuplicate}
+              placeholder={t('fullNamePlaceholder')}
+              error={errors.name}
+              required
+            />
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <Input
@@ -413,7 +421,7 @@ export default function RegisterPatient() {
               name="village"
               value={formData.village}
               onChange={handleChange}
-              placeholder="e.g. Demo Village"
+              placeholder="e.g. Shirur"
               error={errors.village}
               required
             />
@@ -423,19 +431,24 @@ export default function RegisterPatient() {
               name="district"
               value={formData.district}
               onChange={handleChange}
-              placeholder="e.g. Demo District"
+              placeholder="e.g. Pune"
               error={errors.district}
               required
             />
           </div>
 
-          <Input
-            label={t('address')}
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            placeholder="House / Street / Landmark"
-          />
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-700">{t('address')}</label>
+              <VoiceInputButton onTranscript={(txt) => setFormData((prev) => ({ ...prev, address: prev.address ? `${prev.address} ${txt}` : txt }))} />
+            </div>
+            <Input
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              placeholder="House / Street / Landmark"
+            />
+          </div>
         </Card>
 
         {/* Section 2: Clinical & Emergency History (Optional) */}

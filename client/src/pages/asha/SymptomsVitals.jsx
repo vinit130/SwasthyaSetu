@@ -23,6 +23,7 @@ import Card from '../../components/common/Card';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
+import VoiceInputButton from '../../components/common/VoiceInputButton';
 
 const AVAILABLE_SYMPTOMS = [
   'Fever',
@@ -568,9 +569,14 @@ export default function SymptomsVitals() {
           </div>
 
           <div className="pt-2">
-            <label className="text-sm font-medium text-slate-700 block mb-1">
-              {t('fieldNotes')}
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-sm font-medium text-slate-700 block">
+                {t('fieldNotes')}
+              </label>
+              <VoiceInputButton
+                onTranscript={(txt) => setNotes((prev) => (prev ? `${prev} ${txt}` : txt))}
+              />
+            </div>
             <textarea
               rows="2"
               value={notes}

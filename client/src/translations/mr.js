@@ -8,6 +8,8 @@ export const mr = {
   ashaRole: 'आशा / एएनएम आरोग्य सेविका',
   doctorRole: 'वैद्यकीय अधिकारी / डॉक्टर',
   patientRole: 'रुग्ण / कुटुंब',
+  hospitalRole: 'जिल्हा रुग्णालय केंद्र (हॉस्पिटल)',
+  adminRole: 'सार्वजनिक आरोग्य संचालनालय (प्रशासन)',
 
   // Navigation
   dashboard: 'डॅशबोर्ड',
@@ -20,6 +22,13 @@ export const mr = {
   profile: 'प्रोफाइल',
   logout: 'लॉगआउट',
   myCareJourney: 'माझा आरोग्य प्रवास',
+  tokenScanner: 'रेफरल टोकन स्कॅन',
+  bedManagement: 'बेड वाटप व वॉर्ड्स',
+  treatmentEntry: 'रुग्णालय उपचार नोंद',
+  breakGlassTriage: 'आपत्कालीन ट्राइएज',
+  stateSurveillance: 'राज्य आरोग्य देखरेख',
+  facilitiesDirectory: 'आरोग्य सुविधा निर्देशिका',
+  auditTrails: 'ऑडिट ट्रेल व सुरक्षा लॉग',
 
   // Common Actions
   save: 'जतन करा',
@@ -269,8 +278,13 @@ export const mr = {
   demoAshaSub: 'प्राथमिक तपासणी',
   demoDoctorRole: 'डॉक्टर',
   demoDoctorSub: 'क्लिनिकल तपासणी',
+  demoHospitalRole: 'जिल्हा रुग्णालय',
+  demoHospitalSub: 'प्रवेश व बेड व्यवस्थापन',
+  demoAdminRole: 'आरोग्य प्रशासन',
+  demoAdminSub: 'राज्य देखरेख व ऑडिट',
   demoPatientRole: 'रुग्ण',
   demoPatientSub: 'आरोग्य प्रवास',
+  launchOfflineMode: 'ऑफलाइन फील्ड मोड',
   demoPasswordNotice: 'सर्व डेमो खात्यांचा पासवर्ड:',
   loginBrandMessage: 'गावापासून रुग्णालयापर्यंत आरोग्य सेवा सक्षम करणे',
   loginBrandDescription: 'आशा सेविका आणि डॉक्टरांना ग्रामीण कुटुंबांसाठी सतत, जीवनरक्षक काळजी टिकवून ठेवण्यास सक्षम करणे.',

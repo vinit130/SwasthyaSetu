@@ -31,8 +31,39 @@ export default function Navbar() {
 
   const isAsha = user?.role === 'ASHA';
   const isDoctor = user?.role === 'DOCTOR';
+  const isHospital = user?.role === 'DISTRICT_HOSPITAL';
+  const isAdmin = user?.role === 'HEALTH_DEPARTMENT_ADMIN';
   const isPatient = user?.role === 'PATIENT';
-  const homePath = isAsha ? '/asha/dashboard' : isDoctor ? '/doctor/dashboard' : '/patient/dashboard';
+
+  const homePath = isAsha
+    ? '/asha/dashboard'
+    : isDoctor
+    ? '/doctor/dashboard'
+    : isHospital
+    ? '/hospital/dashboard'
+    : isAdmin
+    ? '/admin/dashboard'
+    : '/patient/dashboard';
+
+  const roleLabel = isAsha
+    ? 'ASHA / ANM'
+    : isDoctor
+    ? 'DOCTOR'
+    : isHospital
+    ? 'DISTRICT HOSPITAL'
+    : isAdmin
+    ? 'HEALTH ADMIN'
+    : 'PATIENT';
+
+  const roleBadgeStyle = isAsha
+    ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800'
+    : isDoctor
+    ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+    : isHospital
+    ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+    : isAdmin
+    ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+    : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
 
   return (
     <header className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200/90 dark:border-slate-800 shadow-2xs transition-colors">
@@ -41,15 +72,9 @@ export default function Navbar() {
         <Link to={homePath} className="flex items-center gap-3 group">
           <Logo size="md" showWordmark={true} />
           <span
-            className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider hidden sm:inline-block ${
-              isAsha
-                ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800'
-                : isDoctor
-                ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
-                : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-            }`}
+            className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider hidden sm:inline-block ${roleBadgeStyle}`}
           >
-            {isAsha ? 'ASHA / ANM' : isDoctor ? 'DOCTOR' : 'PATIENT'}
+            {roleLabel}
           </span>
         </Link>
 

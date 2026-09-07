@@ -10,6 +10,7 @@ import {
   Stethoscope,
   Clock,
   ShieldCheck,
+  Building,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -20,6 +21,8 @@ export default function Sidebar() {
   const isAsha = user?.role === 'ASHA';
   const isDoctor = user?.role === 'DOCTOR';
   const isPatient = user?.role === 'PATIENT';
+  const isHospital = user?.role === 'DISTRICT_HOSPITAL';
+  const isAdmin = user?.role === 'HEALTH_DEPARTMENT_ADMIN';
 
   const ashaLinks = [
     { to: '/asha/dashboard', label: t('dashboard'), icon: LayoutDashboard },
@@ -40,19 +43,53 @@ export default function Sidebar() {
     { to: '/profile', label: t('profile'), icon: User },
   ];
 
+  const hospitalLinks = [
+    { to: '/hospital/dashboard', label: t('dashboard') || 'Dashboard', icon: LayoutDashboard },
+    { to: '/hospital/referrals', label: t('tokenScanner') || 'Scan Referral Token', icon: Share2, highlight: true },
+    { to: '/hospital/beds', label: t('bedManagement') || 'Bed Allocation', icon: Building },
+    { to: '/hospital/treatment', label: t('treatmentEntry') || 'Inpatient Treatment', icon: Stethoscope },
+    { to: '/hospital/emergency', label: t('breakGlassTriage') || 'Break-Glass Triage', icon: ShieldCheck },
+    { to: '/profile', label: t('profile') || 'Profile', icon: User },
+  ];
+
+  const adminLinks = [
+    { to: '/admin/dashboard', label: t('stateSurveillance') || 'State Surveillance', icon: LayoutDashboard },
+    { to: '/admin/facilities', label: t('facilitiesDirectory') || 'Facility Network', icon: Building },
+    { to: '/admin/audit-logs', label: t('auditTrails') || 'Audit Trails', icon: ShieldCheck },
+    { to: '/profile', label: t('profile') || 'Profile', icon: User },
+  ];
+
   const patientLinks = [
     { to: '/patient/dashboard', label: t('myCareJourney') || 'My Care Journey', icon: LayoutDashboard },
     { to: '/profile', label: t('profile'), icon: User },
   ];
 
-  const links = isAsha ? ashaLinks : isDoctor ? doctorLinks : patientLinks;
+  const links = isAsha
+    ? ashaLinks
+    : isDoctor
+    ? doctorLinks
+    : isHospital
+    ? hospitalLinks
+    : isAdmin
+    ? adminLinks
+    : patientLinks;
+
+  const roleLabel = isAsha
+    ? t('ashaRole')
+    : isDoctor
+    ? t('doctorRole')
+    : isHospital
+    ? (t('hospitalRole') || 'District Hospital Hub')
+    : isAdmin
+    ? (t('adminRole') || 'Directorate of Health')
+    : (t('patientRole') || 'Patient / Household');
 
   return (
     <aside className="hidden md:flex flex-col w-64 shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 min-h-[calc(100vh-4rem)] p-4 justify-between transition-colors">
       <div className="space-y-1">
         <div className="px-3 py-2 mb-2">
           <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-            {isAsha ? t('ashaRole') : isDoctor ? t('doctorRole') : (t('patientRole') || 'Patient / Household')}
+            {roleLabel}
           </p>
         </div>
 

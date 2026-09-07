@@ -131,6 +131,11 @@ export default function DoctorReferrals() {
                     <span className="font-mono text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
                       {r.patientId?.patientId}
                     </span>
+                    {r.referralToken && (
+                      <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200">
+                        {r.referralToken}
+                      </span>
+                    )}
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
                         r.priority === 'EMERGENCY'

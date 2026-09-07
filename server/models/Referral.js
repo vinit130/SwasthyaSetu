@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 
 const referralSchema = new mongoose.Schema(
   {
+    referralToken: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true,
+    },
     patientId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Patient',
@@ -12,6 +18,10 @@ const referralSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+    },
+    hospitalId: {
+      type: String,
+      default: '',
     },
     reason: {
       type: String,
@@ -38,6 +48,20 @@ const referralSchema = new mongoose.Schema(
       type: String,
       enum: ['CREATED', 'ACCEPTED', 'PATIENT ARRIVED', 'COMPLETED'],
       default: 'CREATED',
+    },
+    bedNumber: {
+      type: String,
+      default: '',
+    },
+    admissionDate: {
+      type: Date,
+    },
+    dischargeDate: {
+      type: Date,
+    },
+    treatmentSummary: {
+      type: String,
+      default: '',
     },
     statusHistory: [
       {

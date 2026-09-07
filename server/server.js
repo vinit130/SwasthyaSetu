@@ -49,6 +49,11 @@ app.use('/api/risk', require('./routes/riskRoutes'));
 app.use('/api/referrals', require('./routes/referralRoutes'));
 app.use('/api/followups', require('./routes/followupRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+app.use('/api/admin', require('./routes/healthAdminRoutes'));
+app.use('/api/hospital', require('./routes/hospitalRoutes'));
+app.use('/api/inventory', require('./routes/inventoryRoutes'));
+app.use('/api/documents', require('./routes/documentRoutes'));
+app.use('/api/facilities', require('./routes/facilityRoutes'));
 
 // Serve client in production or if dist build exists
 const clientDistPath = path.join(__dirname, '../client/dist');

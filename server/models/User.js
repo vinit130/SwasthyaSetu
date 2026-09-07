@@ -27,12 +27,28 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['ASHA', 'DOCTOR', 'PATIENT'],
-    required: [true, 'Role must be either ASHA, DOCTOR, or PATIENT'],
+    enum: ['ASHA', 'DOCTOR', 'PATIENT', 'HEALTH_DEPARTMENT_ADMIN', 'DISTRICT_HOSPITAL'],
+    required: [true, 'Role must be one of: ASHA, DOCTOR, PATIENT, HEALTH_DEPARTMENT_ADMIN, DISTRICT_HOSPITAL'],
   },
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Patient',
+  },
+  facilityId: {
+    type: String,
+    default: '',
+  },
+  facilityName: {
+    type: String,
+    default: '',
+  },
+  assignedDistrict: {
+    type: String,
+    default: 'Pune',
+  },
+  assignedBlock: {
+    type: String,
+    default: '',
   },
   phone: {
     type: String,
@@ -41,7 +57,7 @@ const userSchema = new mongoose.Schema({
   },
   language: {
     type: String,
-    enum: ['en', 'bn'],
+    enum: ['en', 'hi', 'mr', 'bn'],
     default: 'en',
   },
   createdAt: {

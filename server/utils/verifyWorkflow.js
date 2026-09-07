@@ -16,10 +16,12 @@
  */
 
 const axios = require('axios');
+require('../server');
 
 const BASE_URL = 'http://localhost:5000/api';
 
 async function runTests() {
+  await new Promise((resolve) => setTimeout(resolve, 600));
   console.log('\n===============================================================');
   console.log('SWASTHYASETU 3-ROLE ARCHITECTURE & WORKFLOW VERIFICATION SUITE');
   console.log('===============================================================\n');

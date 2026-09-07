@@ -8,6 +8,8 @@ export const en = {
   ashaRole: 'ASHA / ANM Frontline Worker',
   doctorRole: 'Medical Officer / Doctor',
   patientRole: 'Patient / Household',
+  hospitalRole: 'District Hospital Receiving Hub',
+  adminRole: 'Directorate of Health Services (Admin)',
 
   // Navigation
   dashboard: 'Dashboard',
@@ -20,6 +22,13 @@ export const en = {
   profile: 'Profile',
   logout: 'Logout',
   myCareJourney: 'My Care Journey',
+  tokenScanner: 'Scan Referral Token',
+  bedManagement: 'Bed Allocation & Wards',
+  treatmentEntry: 'Inpatient Treatment',
+  breakGlassTriage: 'Break-Glass Emergency Triage',
+  stateSurveillance: 'State Health Surveillance',
+  facilitiesDirectory: 'Facility Network Directory',
+  auditTrails: 'Governance Audit Trails',
 
   // Common Actions
   save: 'Save',
@@ -269,8 +278,13 @@ export const en = {
   demoAshaSub: 'Frontline Screening',
   demoDoctorRole: 'Doctor',
   demoDoctorSub: 'Clinical Reviews',
+  demoHospitalRole: 'District Hospital',
+  demoHospitalSub: 'Admissions & Beds',
+  demoAdminRole: 'Health Admin',
+  demoAdminSub: 'State Surveillance',
   demoPatientRole: 'Patient',
   demoPatientSub: 'Care Journey',
+  launchOfflineMode: 'Offline Field Mode',
   demoPasswordNotice: 'Password for all demo accounts:',
   loginBrandMessage: 'Connecting Frontline Healthcare from Village to Hospital',
   loginBrandDescription: 'Empowering ASHA workers and doctors to maintain continuous, life-saving care journeys for rural households across India.',

@@ -4,9 +4,12 @@ const Visit = require('../models/Visit');
 const Consultation = require('../models/Consultation');
 const Referral = require('../models/Referral');
 const Followup = require('../models/Followup');
+const HospitalEncounter = require('../models/HospitalEncounter');
+const MedicalDocument = require('../models/MedicalDocument');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const mockStore = require('../utils/mockStore');
+const { validateIndianPhone } = require('../utils/validators');
 
 // @desc    Get all patients with search & risk filter
 // @route   GET /api/patients
@@ -172,6 +175,13 @@ exports.createPatient = async (req, res, next) => {
       allowDuplicate = false,
     } = req.body;
 
+    if (!phone || !validateIndianPhone(phone)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid phone number. Please provide a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.',
+      });
+    }
+
     // Check duplicate unless explicitly confirmed by ASHA
     const duplicateQuery = {
       name: new RegExp(`^${name.trim()}$`, 'i'),
@@ -198,7 +208,7 @@ exports.createPatient = async (req, res, next) => {
       address: address || '',
       village: village.trim(),
       district: district.trim(),
-      state: state || 'West Bengal',
+      state: state || 'Maharashtra',
       emergencyContact: emergencyContact || '',
       bloodGroup: bloodGroup || 'Unknown',
       allergies: Array.isArray(allergies) ? allergies : allergies ? [allergies] : [],
@@ -309,6 +319,15 @@ exports.getPatientById = async (req, res, next) => {
       .populate('completedBy', 'name role')
       .sort({ date: -1 });
 
+    const encounters = await HospitalEncounter.find({ patientId: patient._id })
+      .populate('attendingDoctorId', 'name role')
+      .sort({ createdAt: -1 });
+
+    const documents = await MedicalDocument.find({ patientId: patient._id })
+      .populate('uploadedBy', 'name role')
+      .select('-fileData')
+      .sort({ createdAt: -1 });
+
     // Build unified chronological timeline
     const timeline = [];
 
@@ -373,10 +392,36 @@ exports.getPatientById = async (req, res, next) => {
         type: 'REFERRAL',
         date: r.createdAt,
         title: `Hospital Referral: ${r.facility}`,
-        description: `Department: ${r.department} | Priority: ${r.priority} | Status: ${r.status}`,
+        description: `Department: ${r.department} | Priority: ${r.priority} | Status: ${r.status}${r.referralToken ? ` | Token: ${r.referralToken}` : ''}`,
         badge: r.status,
         badgeColor: r.status === 'COMPLETED' ? 'green' : 'purple',
         data: r,
+      });
+    });
+
+    // Hospital Encounter events
+    encounters.forEach((e) => {
+      timeline.push({
+        type: 'HOSPITAL_ENCOUNTER',
+        date: e.createdAt,
+        title: `Hospital Care: ${e.encounterType} (${e.facilityName})`,
+        description: `Diagnosis: ${e.diagnosis}. Treatment: ${e.treatmentSummary}`,
+        badge: e.encounterType,
+        badgeColor: 'indigo',
+        data: e,
+      });
+    });
+
+    // Medical Document events
+    documents.forEach((d) => {
+      timeline.push({
+        type: 'MEDICAL_DOCUMENT',
+        date: d.createdAt,
+        title: `Document: ${d.title}`,
+        description: `Type: ${d.documentType} | Facility: ${d.facilityName || 'SwasthyaSetu'} | Uploaded by: ${d.uploadedBy?.name || 'Staff'}`,
+        badge: d.documentType,
+        badgeColor: 'teal',
+        data: d,
       });
     });
 
@@ -415,6 +460,8 @@ exports.getPatientById = async (req, res, next) => {
         visits,
         consultations,
         referrals,
+        encounters,
+        documents,
         followups,
         timeline,
       },

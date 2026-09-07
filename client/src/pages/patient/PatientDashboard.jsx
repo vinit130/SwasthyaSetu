@@ -25,6 +25,8 @@ import Badge from '../../components/common/Badge';
 import SkeletonLoader from '../../components/common/SkeletonLoader';
 import EmptyState from '../../components/common/EmptyState';
 import { formatDate } from '../../utils/formatters';
+import DocumentList from '../../components/documents/DocumentList';
+import NearbyFacilities from '../../components/common/NearbyFacilities';
 
 export default function PatientDashboard() {
   const { user } = useAuth();
@@ -278,6 +280,26 @@ export default function PatientDashboard() {
           >
             {t('followups')} ({followups?.length || 0})
           </button>
+          <button
+            onClick={() => setActiveTab('records')}
+            className={`pb-3 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'records'
+                ? 'border-teal-600 text-teal-700 dark:text-teal-400 font-semibold'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+            }`}
+          >
+            My Medical Records
+          </button>
+          <button
+            onClick={() => setActiveTab('facilities')}
+            className={`pb-3 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+              activeTab === 'facilities'
+                ? 'border-teal-600 text-teal-700 dark:text-teal-400 font-semibold'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+            }`}
+          >
+            Nearby Hospitals
+          </button>
         </nav>
       </div>
 
@@ -447,6 +469,22 @@ export default function PatientDashboard() {
                   </div>
                 </div>
 
+                {r.referralToken && (
+                  <div className="p-3 bg-purple-50 rounded-xl border border-purple-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-purple-700 block">
+                        Official Referral Token Slip:
+                      </span>
+                      <span className="font-mono font-black text-sm text-purple-950 tracking-wider">
+                        {r.referralToken}
+                      </span>
+                    </div>
+                    <span className="text-[10px] bg-purple-200 text-purple-900 px-2.5 py-1 rounded-md font-bold self-start sm:self-auto">
+                      Show at Hospital Reception Desk
+                    </span>
+                  </div>
+                )}
+
                 {r.instructions && (
                   <div className="p-2.5 bg-slate-50 rounded-lg text-xs text-slate-700 border border-slate-100">
                     <strong>Instructions:</strong> {r.instructions}
@@ -519,6 +557,23 @@ export default function PatientDashboard() {
             ))
           )}
         </div>
+      )}
+
+      {/* TAB 5: My Medical Documents */}
+      {activeTab === 'records' && (
+        <DocumentList
+          patientId={patient._id || patient.id}
+          patientName={patient.name}
+          canUpload={false}
+        />
+      )}
+
+      {/* TAB 6: Nearby Healthcare Facilities */}
+      {activeTab === 'facilities' && (
+        <NearbyFacilities
+          currentDistrict={patient.district || 'Pune'}
+          title="Nearby Healthcare Institutions & Bed Availability"
+        />
       )}
 
       {/* Clinical Disclaimer in Patient Footer */}

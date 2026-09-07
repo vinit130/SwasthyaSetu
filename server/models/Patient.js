@@ -30,6 +30,12 @@ const patientSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Phone number is required'],
       trim: true,
+      validate: {
+        validator: function (v) {
+          return /^[6-9]\d{9}$/.test(v.replace(/[\s\-]/g, ''));
+        },
+        message: (props) => `${props.value} is not a valid 10-digit Indian phone number!`,
+      },
     },
     address: {
       type: String,
@@ -40,17 +46,19 @@ const patientSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Village is required'],
       trim: true,
+      index: true,
     },
     district: {
       type: String,
       required: [true, 'District is required'],
       trim: true,
+      index: true,
     },
     state: {
       type: String,
       required: [true, 'State is required'],
       trim: true,
-      default: 'West Bengal',
+      default: 'Maharashtra',
     },
     emergencyContact: {
       type: String,
@@ -74,6 +82,7 @@ const patientSchema = new mongoose.Schema(
       type: String,
       enum: ['GREEN', 'YELLOW', 'RED', 'PENDING_REVIEW'],
       default: 'PENDING_REVIEW',
+      index: true,
     },
     riskNote: {
       type: String,

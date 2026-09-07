@@ -8,6 +8,9 @@ import {
   CalendarCheck,
   Stethoscope,
   Clock,
+  Building,
+  ShieldCheck,
+  User,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -17,6 +20,8 @@ export default function MobileNav() {
   const { t } = useLanguage();
   const isAsha = user?.role === 'ASHA';
   const isDoctor = user?.role === 'DOCTOR';
+  const isHospital = user?.role === 'DISTRICT_HOSPITAL';
+  const isAdmin = user?.role === 'HEALTH_DEPARTMENT_ADMIN';
 
   if (!user) return null;
 
@@ -149,6 +154,118 @@ export default function MobileNav() {
               <span>{t('referrals')}</span>
             </NavLink>
           </>
+        ) : isHospital ? (
+          <>
+            <NavLink
+              to="/hospital/dashboard"
+              className={({ isActive }) =>
+                `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
+                  isActive ? 'text-rose-700 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'
+                }`
+              }
+            >
+              <LayoutDashboard className="w-5 h-5 mb-0.5" />
+              <span>{t('dashboard')}</span>
+            </NavLink>
+
+            <NavLink
+              to="/hospital/referrals"
+              className={({ isActive }) =>
+                `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
+                  isActive ? 'text-rose-700 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'
+                }`
+              }
+            >
+              <Share2 className="w-5 h-5 mb-0.5" />
+              <span>Tokens</span>
+            </NavLink>
+
+            <NavLink
+              to="/hospital/beds"
+              className={({ isActive }) =>
+                `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
+                  isActive ? 'text-rose-700 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'
+                }`
+              }
+            >
+              <Building className="w-5 h-5 mb-0.5" />
+              <span>Beds</span>
+            </NavLink>
+
+            <NavLink
+              to="/hospital/treatment"
+              className={({ isActive }) =>
+                `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
+                  isActive ? 'text-rose-700 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'
+                }`
+              }
+            >
+              <Stethoscope className="w-5 h-5 mb-0.5" />
+              <span>Care</span>
+            </NavLink>
+
+            <NavLink
+              to="/hospital/emergency"
+              className={({ isActive }) =>
+                `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
+                  isActive ? 'text-rose-700 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'
+                }`
+              }
+            >
+              <ShieldCheck className="w-5 h-5 mb-0.5" />
+              <span>Triage</span>
+            </NavLink>
+          </>
+        ) : isAdmin ? (
+          <>
+            <NavLink
+              to="/admin/dashboard"
+              className={({ isActive }) =>
+                `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
+                  isActive ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'
+                }`
+              }
+            >
+              <LayoutDashboard className="w-5 h-5 mb-0.5" />
+              <span>Surveillance</span>
+            </NavLink>
+
+            <NavLink
+              to="/admin/facilities"
+              className={({ isActive }) =>
+                `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
+                  isActive ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'
+                }`
+              }
+            >
+              <Building className="w-5 h-5 mb-0.5" />
+              <span>Facilities</span>
+            </NavLink>
+
+            <NavLink
+              to="/admin/audit-logs"
+              className={({ isActive }) =>
+                `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
+                  isActive ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'
+                }`
+              }
+            >
+              <ShieldCheck className="w-5 h-5 mb-0.5" />
+              <span>Audit Logs</span>
+            </NavLink>
+
+            <NavLink
+              to="/profile"
+              className={({ isActive }) =>
+                `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
+                  isActive ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'
+                }`
+              }
+            >
+              <User className="w-5 h-5 mb-0.5" />
+              <span>{t('profile')}</span>
+            </NavLink>
+          </>
         ) : (
           <>
             <NavLink
@@ -171,7 +288,7 @@ export default function MobileNav() {
                 }`
               }
             >
-              <Users className="w-5 h-5 mb-0.5" />
+              <User className="w-5 h-5 mb-0.5" />
               <span>{t('profile')}</span>
             </NavLink>
           </>

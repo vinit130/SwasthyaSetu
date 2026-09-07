@@ -8,6 +8,9 @@ import {
   CheckCircle2,
   Clock,
   AlertTriangle,
+  Hospital,
+  FileText,
+  AlertOctagon,
 } from 'lucide-react';
 import Badge from '../common/Badge';
 import { formatDateTime, formatDate } from '../../utils/formatters';
@@ -31,6 +34,14 @@ export default function PatientTimeline({ events = [] }) {
         return <Stethoscope className="w-4 h-4 text-indigo-600" />;
       case 'REFERRAL':
         return <Share2 className="w-4 h-4 text-purple-600" />;
+      case 'HOSPITAL_ENCOUNTER':
+      case 'HOSPITAL_TREATMENT':
+        return <Hospital className="w-4 h-4 text-indigo-600" />;
+      case 'EMERGENCY_ENCOUNTER':
+        return <AlertOctagon className="w-4 h-4 text-red-600" />;
+      case 'MEDICAL_DOCUMENT':
+      case 'DOCUMENT':
+        return <FileText className="w-4 h-4 text-emerald-600" />;
       case 'FOLLOWUP':
         return <CalendarCheck className="w-4 h-4 text-amber-600" />;
       default:
