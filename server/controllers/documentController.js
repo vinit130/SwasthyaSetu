@@ -77,18 +77,23 @@ exports.uploadDocument = async (req, res, next) => {
       });
     }
 
+    const detectedType = mimeType || req.body.fileType || 'application/pdf';
+    const cleanNotes = doctorNotes || req.body.notes || '';
+
     const doc = new MedicalDocument({
       patientId,
       title: title.trim(),
-      documentType,
+      documentType: documentType === 'SCAN_XRAY' ? 'DIAGNOSTIC_SCAN' : documentType,
       fileName: fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`,
       fileData,
-      mimeType: mimeType || 'application/pdf',
+      fileType: detectedType,
+      mimeType: detectedType,
       fileSize: fileSize || Math.round(fileData.length * 0.75),
       facilityName: facilityName || '',
       uploadedBy: req.user._id || req.user.id,
       uploaderRole: req.user.role,
-      doctorNotes: doctorNotes || '',
+      notes: cleanNotes,
+      doctorNotes: cleanNotes,
     });
 
     const saved = await doc.save();

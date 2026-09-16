@@ -108,61 +108,61 @@ export default function HospitalDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-500 mb-1">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
             <span className="text-xs font-semibold">Total Inbound</span>
             <Share2 className="w-4 h-4 text-purple-500" />
           </div>
-          <p className="text-2xl font-black text-slate-900">{referrals.length}</p>
-          <span className="text-[10px] text-slate-400">Referrals registered</span>
+          <p className="text-2xl font-black text-slate-900 dark:text-slate-100">{referrals.length}</p>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500">Referrals registered</span>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-blue-200 shadow-2xs bg-blue-50/20">
-          <div className="flex items-center justify-between text-blue-600 mb-1">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-blue-200 dark:border-blue-900/50 shadow-2xs bg-blue-50/20 dark:bg-blue-950/20">
+          <div className="flex items-center justify-between text-blue-600 dark:text-blue-400 mb-1">
             <span className="text-xs font-semibold">Awaiting Arrival</span>
             <Clock className="w-4 h-4 text-blue-500" />
           </div>
-          <p className="text-2xl font-black text-blue-700">{pendingArrivals.length}</p>
-          <span className="text-[10px] text-blue-500 font-medium">Created or Accepted</span>
+          <p className="text-2xl font-black text-blue-700 dark:text-blue-300">{pendingArrivals.length}</p>
+          <span className="text-[10px] text-blue-500 dark:text-blue-400 font-medium">Created or Accepted</span>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-emerald-200 shadow-2xs bg-emerald-50/20">
-          <div className="flex items-center justify-between text-emerald-600 mb-1">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/50 shadow-2xs bg-emerald-50/20 dark:bg-emerald-950/20">
+          <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 mb-1">
             <span className="text-xs font-semibold">Under Treatment</span>
             <CheckCircle className="w-4 h-4 text-emerald-500" />
           </div>
-          <p className="text-2xl font-black text-emerald-700">{activeTreatments.length}</p>
-          <span className="text-[10px] text-emerald-600 font-medium">Patient Arrived</span>
+          <p className="text-2xl font-black text-emerald-700 dark:text-emerald-300">{activeTreatments.length}</p>
+          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Patient Arrived</span>
         </div>
 
         <Link
           to="/hospital/beds"
-          className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs hover:border-purple-300 transition-all group block"
+          className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-purple-300 dark:hover:border-purple-600 transition-all group block"
         >
-          <div className="flex items-center justify-between text-purple-600 mb-1">
+          <div className="flex items-center justify-between text-purple-600 dark:text-purple-400 mb-1">
             <span className="text-xs font-semibold">Ward Beds</span>
             <Bed className="w-4 h-4 text-purple-500 group-hover:scale-110 transition-transform" />
           </div>
-          <p className="text-2xl font-black text-slate-900">{availableBeds} Available</p>
-          <span className="text-[10px] text-slate-500">{occupancyRate}% occupancy ({occupiedBeds}/{totalBeds})</span>
+          <p className="text-2xl font-black text-slate-900 dark:text-slate-100">{availableBeds} Available</p>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400">{occupancyRate}% occupancy ({occupiedBeds}/{totalBeds})</span>
         </Link>
       </div>
 
       {/* Inbound Referrals Queue with State Machine Transitions */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <div>
-            <h3 className="font-bold text-slate-900 flex items-center gap-2 text-base">
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2 text-base">
               <Share2 className="w-5 h-5 text-purple-600" />
               Inbound Hospital Referrals & Triage Workflow
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Sequential continuum of care: CREATED → ACCEPTED → PATIENT ARRIVED → COMPLETED
             </p>
           </div>
           <button
             onClick={loadData}
-            className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"
+            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -172,26 +172,26 @@ export default function HospitalDashboard() {
         {loading ? (
           <div className="py-12 text-center text-slate-400 text-sm">Loading inbound referrals...</div>
         ) : referrals.length === 0 ? (
-          <div className="py-12 text-center text-slate-500 text-sm">No referrals currently routed to this hospital.</div>
+          <div className="py-12 text-center text-slate-500 dark:text-slate-400 text-sm">No referrals currently routed to this hospital.</div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {referrals.map((ref) => (
               <div
                 key={ref._id || ref.id}
-                className="p-4 sm:p-5 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 hover:bg-slate-50/60 transition-colors"
+                className="p-4 sm:p-5 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors"
               >
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 border border-purple-200">
+                    <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950/50 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
                       {ref.referralToken || 'TOKEN-PENDING'}
                     </span>
                     <span
                       className={`px-2 py-0.5 text-[10px] font-bold rounded-md uppercase ${
                         ref.priority === 'EMERGENCY'
-                          ? 'bg-red-100 text-red-800 animate-pulse'
+                          ? 'bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300 animate-pulse'
                           : ref.priority === 'URGENT'
-                          ? 'bg-amber-100 text-amber-800'
-                          : 'bg-slate-100 text-slate-700'
+                          ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       {ref.priority} Priority
@@ -199,30 +199,30 @@ export default function HospitalDashboard() {
                     <span
                       className={`px-2 py-0.5 text-[10px] font-bold rounded-md ${
                         ref.status === 'COMPLETED'
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300'
                           : ref.status === 'PATIENT ARRIVED'
-                          ? 'bg-indigo-100 text-indigo-800'
+                          ? 'bg-indigo-100 dark:bg-indigo-950/50 text-indigo-800 dark:text-indigo-300'
                           : ref.status === 'ACCEPTED'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-amber-100 text-amber-800'
+                          ? 'bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-300'
+                          : 'bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300'
                       }`}
                     >
                       Status: {ref.status}
                     </span>
                   </div>
 
-                  <h4 className="font-bold text-slate-900 text-sm">
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
                     {ref.patientId?.name || 'Patient'}
-                    <span className="font-normal text-slate-500 text-xs ml-2">
+                    <span className="font-normal text-slate-500 dark:text-slate-400 text-xs ml-2">
                       ({ref.patientId?.gender}, {ref.patientId?.age} yrs, Phone: {ref.patientId?.phone})
                     </span>
                   </h4>
 
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-slate-600 dark:text-slate-300">
                     <strong>Department:</strong> {ref.department} • <strong>Reason:</strong> {ref.reason}
                   </p>
                   {ref.instructions && (
-                    <p className="text-xs text-slate-500 italic bg-white p-1.5 rounded border border-slate-100">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 italic bg-white dark:bg-slate-800/80 p-1.5 rounded border border-slate-100 dark:border-slate-700">
                       Doctor instructions: "{ref.instructions}"
                     </p>
                   )}
@@ -262,7 +262,7 @@ export default function HospitalDashboard() {
                   )}
 
                   {ref.status === 'COMPLETED' && (
-                    <span className="px-3 py-1 text-xs font-semibold text-emerald-800 bg-emerald-50 rounded-lg flex items-center gap-1">
+                    <span className="px-3 py-1 text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 rounded-lg flex items-center gap-1">
                       <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> Completed
                     </span>
                   )}

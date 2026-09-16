@@ -40,6 +40,10 @@ const protect = async (req, res, next) => {
             patientId: mockUser.patientId,
             phone: mockUser.phone,
             language: mockUser.language,
+            facilityId: mockUser.facilityId || '',
+            facilityName: mockUser.facilityName || '',
+            assignedDistrict: mockUser.assignedDistrict || '',
+            assignedBlock: mockUser.assignedBlock || '',
           };
         }
       }

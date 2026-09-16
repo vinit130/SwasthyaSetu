@@ -203,9 +203,9 @@ export default function PatientDashboard() {
       </Card>
 
       {/* Doctor Confirmed Risk & Advice Banner */}
-      <Card className="p-5 bg-white border border-slate-200">
+      <Card className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <div className="flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0 mt-0.5">
+          <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 flex items-center justify-center shrink-0 mt-0.5">
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div className="flex-1">
@@ -306,14 +306,14 @@ export default function PatientDashboard() {
       {/* TAB 1: 6-Step Care Journey Timeline */}
       {activeTab === 'journey' && (
         <div className="space-y-4">
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 flex items-center gap-2">
-            <HeartPulse className="w-4 h-4 text-teal-600 shrink-0" />
+          <div className="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2">
+            <HeartPulse className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
             <span>
               {t('patientHubSubtitle')}
             </span>
           </div>
 
-          <div className="relative pl-6 sm:pl-8 space-y-6 before:absolute before:left-3 sm:before:left-4 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200">
+          <div className="relative pl-6 sm:pl-8 space-y-6 before:absolute before:left-3 sm:before:left-4 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-700">
             {steps.map((step) => {
               const Icon = step.icon;
               return (
@@ -325,7 +325,7 @@ export default function PatientDashboard() {
                         ? 'bg-teal-600 text-white shadow-xs'
                         : step.active
                         ? 'bg-amber-500 text-white animate-pulse'
-                        : 'bg-slate-200 text-slate-500'
+                        : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     {step.completed ? (
@@ -337,20 +337,20 @@ export default function PatientDashboard() {
 
                   {/* Step Card */}
                   <Card className={`flex-1 p-4 transition-all ${
-                    step.completed ? 'bg-white border-slate-200' : 'bg-slate-50/70 border-dashed border-slate-200'
+                    step.completed ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800' : 'bg-slate-50/70 dark:bg-slate-800/40 border-dashed border-slate-200 dark:border-slate-700'
                   }`}>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                       <div className="flex items-center gap-2">
-                        <Icon className={`w-4 h-4 ${step.completed ? 'text-teal-600' : 'text-slate-400'}`} />
-                        <h4 className="font-bold text-sm text-slate-900">{step.title}</h4>
+                        <Icon className={`w-4 h-4 ${step.completed ? 'text-teal-600 dark:text-teal-400' : 'text-slate-400 dark:text-slate-500'}`} />
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">{step.title}</h4>
                       </div>
                       {step.date && (
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-slate-400 dark:text-slate-500">
                           {formatDate(step.date)}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">{step.subtext}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{step.subtext}</p>
                   </Card>
                 </div>
               );
@@ -369,32 +369,32 @@ export default function PatientDashboard() {
             />
           ) : (
             consultations.map((c) => (
-              <Card key={c._id} className="p-5 bg-white border-slate-200 space-y-3.5">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <Card key={c._id} className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3.5">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
                   <div>
-                    <span className="font-bold text-sm text-slate-900">
+                    <span className="font-bold text-sm text-slate-900 dark:text-white">
                       Dr. {c.doctorId?.name || 'Medical Officer'}
                     </span>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
                       Consultation on {formatDate(c.consultationDate)}
                     </p>
                   </div>
-                  <span className="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-semibold border border-indigo-200">
+                  <span className="text-xs bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2.5 py-1 rounded-full font-semibold border border-indigo-200 dark:border-indigo-800">
                     Clinical Visit
                   </span>
                 </div>
 
                 {c.assessment && (
                   <div className="text-xs">
-                    <span className="text-slate-400 font-semibold block uppercase text-[10px]">
+                    <span className="text-slate-400 dark:text-slate-500 font-semibold block uppercase text-[10px]">
                       Doctor's Clinical Assessment:
                     </span>
-                    <p className="text-slate-800 font-medium mt-0.5">{c.assessment}</p>
+                    <p className="text-slate-800 dark:text-slate-200 font-medium mt-0.5">{c.assessment}</p>
                   </div>
                 )}
 
                 {c.advice && (
-                  <div className="text-xs bg-teal-50/60 p-3 rounded-xl border border-teal-100 text-teal-900">
+                  <div className="text-xs bg-teal-50/60 dark:bg-teal-950/40 p-3 rounded-xl border border-teal-100 dark:border-teal-900 text-teal-900 dark:text-teal-200">
                     <strong className="block mb-0.5">Doctor Advice:</strong>
                     <p>{c.advice}</p>
                   </div>
@@ -402,21 +402,21 @@ export default function PatientDashboard() {
 
                 {c.prescriptions?.length > 0 && (
                   <div>
-                    <span className="text-xs font-bold text-slate-800 block mb-2 flex items-center gap-1.5">
-                      <Pill className="w-4 h-4 text-indigo-600" />
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-2 flex items-center gap-1.5">
+                      <Pill className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                       <span>Prescribed Medications:</span>
                     </span>
                     <div className="space-y-2">
                       {c.prescriptions.map((p, idx) => (
                         <div
                           key={idx}
-                          className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                          className="p-3 bg-slate-50 dark:bg-slate-800/70 rounded-xl border border-slate-200/80 dark:border-slate-700 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2"
                         >
                           <div>
-                            <span className="font-bold text-slate-900 text-sm">{p.medication}</span>
-                            <span className="text-slate-500 ml-2 font-medium">({p.dosage})</span>
+                            <span className="font-bold text-slate-900 dark:text-white text-sm">{p.medication}</span>
+                            <span className="text-slate-500 dark:text-slate-400 ml-2 font-medium">({p.dosage})</span>
                           </div>
-                          <div className="flex items-center gap-3 text-slate-600 font-medium">
+                          <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300 font-medium">
                             <span>{p.frequency}</span>
                             <span>•</span>
                             <span>{p.duration}</span>
@@ -442,13 +442,13 @@ export default function PatientDashboard() {
             />
           ) : (
             referrals.map((r) => (
-              <Card key={r._id} className="p-5 bg-white border-slate-200 space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <Card key={r._id} className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
                   <div className="flex items-center gap-2">
-                    <Building className="w-5 h-5 text-purple-600" />
+                    <Building className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                     <div>
-                      <h4 className="font-bold text-sm text-slate-900">{r.facility}</h4>
-                      <p className="text-xs text-slate-500">{r.department}</p>
+                      <h4 className="font-bold text-sm text-slate-900 dark:text-white">{r.facility}</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{r.department}</p>
                     </div>
                   </div>
                   <Badge type="referral" value={r.status} />
@@ -456,44 +456,44 @@ export default function PatientDashboard() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-semibold">
+                    <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">
                       Reason for Referral:
                     </span>
-                    <span className="font-medium text-slate-800">{r.reason}</span>
+                    <span className="font-medium text-slate-800 dark:text-slate-200">{r.reason}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-semibold">
+                    <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">
                       Priority Level:
                     </span>
-                    <span className="font-semibold text-purple-700">{r.priority}</span>
+                    <span className="font-semibold text-purple-700 dark:text-purple-300">{r.priority}</span>
                   </div>
                 </div>
 
                 {r.referralToken && (
-                  <div className="p-3 bg-purple-50 rounded-xl border border-purple-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="p-3 bg-purple-50 dark:bg-purple-950/40 rounded-xl border border-purple-200 dark:border-purple-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-purple-700 block">
-                        Official Referral Token Slip:
+                      <span className="text-[10px] uppercase font-bold text-purple-700 dark:text-purple-300 block">
+                         Official Referral Token Slip:
                       </span>
-                      <span className="font-mono font-black text-sm text-purple-950 tracking-wider">
+                      <span className="font-mono font-black text-sm text-purple-950 dark:text-purple-100 tracking-wider">
                         {r.referralToken}
                       </span>
                     </div>
-                    <span className="text-[10px] bg-purple-200 text-purple-900 px-2.5 py-1 rounded-md font-bold self-start sm:self-auto">
+                    <span className="text-[10px] bg-purple-200 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 px-2.5 py-1 rounded-md font-bold self-start sm:self-auto">
                       Show at Hospital Reception Desk
                     </span>
                   </div>
                 )}
 
                 {r.instructions && (
-                  <div className="p-2.5 bg-slate-50 rounded-lg text-xs text-slate-700 border border-slate-100">
+                  <div className="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-lg text-xs text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-700">
                     <strong>Instructions:</strong> {r.instructions}
                   </div>
                 )}
 
                 {/* Sequential Lifecycle Visualizer */}
-                <div className="pt-2 border-t border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-2">
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-2">
                     Referral Journey Progress
                   </span>
                   <div className="grid grid-cols-4 gap-1 text-center text-[10px] font-semibold">
@@ -506,8 +506,8 @@ export default function PatientDashboard() {
                           key={s}
                           className={`p-1.5 rounded-lg border ${
                             isPastOrCurrent
-                              ? 'bg-purple-50 text-purple-800 border-purple-200 font-bold'
-                              : 'bg-slate-50 text-slate-400 border-slate-100'
+                              ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-800 font-bold'
+                              : 'bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 border-slate-100 dark:border-slate-800'
                           }`}
                         >
                           {s}
@@ -532,15 +532,15 @@ export default function PatientDashboard() {
             />
           ) : (
             followups.map((f) => (
-              <Card key={f._id} className="p-5 bg-white border-slate-200 space-y-2.5">
+              <Card key={f._id} className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <CalendarCheck className="w-5 h-5 text-amber-600" />
+                    <CalendarCheck className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                     <div>
-                      <h4 className="font-bold text-sm text-slate-900">
+                      <h4 className="font-bold text-sm text-slate-900 dark:text-white">
                         Check-in: {formatDate(f.dueDate)}
                       </h4>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         Scheduled by Dr. {f.scheduledBy?.name || 'Doctor'}
                       </p>
                     </div>
@@ -549,7 +549,7 @@ export default function PatientDashboard() {
                 </div>
 
                 {f.instructions && (
-                  <p className="text-xs text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                  <p className="text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700">
                     <strong>Instructions:</strong> {f.instructions}
                   </p>
                 )}
@@ -577,11 +577,11 @@ export default function PatientDashboard() {
       )}
 
       {/* Clinical Disclaimer in Patient Footer */}
-      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-center text-xs text-slate-500 space-y-1">
-        <p className="font-semibold text-slate-700">
+      <div className="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400 space-y-1">
+        <p className="font-semibold text-slate-700 dark:text-slate-200">
           {t('appName')} — {t('tagline')}
         </p>
-        <p className="text-[11px] text-slate-400">
+        <p className="text-[11px] text-slate-400 dark:text-slate-500">
           {t('disclaimer')}
         </p>
       </div>

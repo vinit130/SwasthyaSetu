@@ -68,17 +68,17 @@ export default function ReferralTokenScanner() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+        <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
           <Search className="w-6 h-6 text-purple-600" />
           Referral Token Slip Verification
         </h1>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           Scan or enter patient's unique referral slip token (e.g. SS-REF-2026-8X4K29) for instant verification
         </p>
       </div>
 
       {/* Token Search Box */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <form onSubmit={handleLookup} className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative flex-1 w-full">
             <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-3" />
@@ -87,7 +87,7 @@ export default function ReferralTokenScanner() {
               placeholder="Enter token: SS-REF-2026-XXXXXX"
               value={tokenInput}
               onChange={(e) => setTokenInput(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 text-sm font-mono border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 uppercase tracking-wider"
+              className="w-full pl-11 pr-4 py-2.5 text-sm font-mono border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 uppercase tracking-wider"
             />
           </div>
 
@@ -106,7 +106,7 @@ export default function ReferralTokenScanner() {
               onClick={() => {
                 setTokenInput('SS-REF-2026-8X4K29');
               }}
-              className="px-3 py-2.5 text-xs text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-xl border border-purple-200 whitespace-nowrap font-medium"
+              className="px-3 py-2.5 text-xs text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-xl border border-purple-200 dark:border-purple-800 whitespace-nowrap font-medium"
             >
               Paste Demo
             </button>
@@ -114,14 +114,14 @@ export default function ReferralTokenScanner() {
         </form>
 
         {error && (
-          <div className="mt-4 p-3.5 bg-red-50 text-red-700 text-xs rounded-xl flex items-center justify-between gap-2 border border-red-200">
+          <div className="mt-4 p-3.5 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 text-xs rounded-xl flex items-center justify-between gap-2 border border-red-200 dark:border-red-800">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
               <span>{error}</span>
             </div>
             <Link
               to="/hospital/emergency"
-              className="text-xs font-bold text-red-800 underline hover:no-underline whitespace-nowrap"
+              className="text-xs font-bold text-red-800 dark:text-red-400 underline hover:no-underline whitespace-nowrap"
             >
               Emergency Direct Lookup →
             </Link>
@@ -129,7 +129,7 @@ export default function ReferralTokenScanner() {
         )}
 
         {statusMessage && (
-          <div className="mt-4 p-3.5 bg-emerald-50 text-emerald-800 text-xs rounded-xl flex items-center gap-2 border border-emerald-200">
+          <div className="mt-4 p-3.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs rounded-xl flex items-center gap-2 border border-emerald-200 dark:border-emerald-800">
             <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{statusMessage}</span>
           </div>
@@ -138,18 +138,18 @@ export default function ReferralTokenScanner() {
 
       {/* Verified Referral Details Card */}
       {referral && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-fadeIn">
-          <div className="p-5 border-b border-slate-200 bg-purple-50/40 flex flex-wrap items-center justify-between gap-3">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-fadeIn">
+          <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-purple-50/40 dark:bg-purple-950/20 flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-mono text-sm font-black px-2.5 py-1 rounded-lg bg-purple-200 text-purple-900 border border-purple-300">
+                <span className="font-mono text-sm font-black px-2.5 py-1 rounded-lg bg-purple-200 dark:bg-purple-900 text-purple-900 dark:text-purple-100 border border-purple-300 dark:border-purple-700">
                   {referral.referralToken}
                 </span>
-                <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center gap-1 border border-emerald-200 dark:border-emerald-800">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> Slip Verified Authentic
                 </span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Created on {new Date(referral.createdAt).toLocaleString('en-IN')} by Dr. {doc.name || 'Referring Physician'}
               </p>
             </div>
@@ -158,7 +158,7 @@ export default function ReferralTokenScanner() {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="p-2 text-slate-500 hover:text-slate-700 hover:bg-white rounded-lg border border-slate-200"
+                className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
                 title="Print Slip"
               >
                 <Printer className="w-4 h-4" />
@@ -168,42 +168,42 @@ export default function ReferralTokenScanner() {
 
           <div className="p-6 space-y-6">
             {/* Patient Demographic Box */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
               <div>
-                <span className="text-slate-400 block text-[10px] uppercase font-bold">Patient Name</span>
-                <span className="font-bold text-sm text-slate-900">{p.name}</span>
-                <span className="text-slate-500 block">ID: {p.patientId}</span>
+                <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-bold">Patient Name</span>
+                <span className="font-bold text-sm text-slate-900 dark:text-slate-100">{p.name}</span>
+                <span className="text-slate-500 dark:text-slate-400 block">ID: {p.patientId}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[10px] uppercase font-bold">Demographics</span>
-                <span className="font-semibold text-slate-800">{p.gender}, {p.age} years</span>
-                <span className="text-slate-500 block">Blood: {p.bloodGroup || 'Unknown'}</span>
+                <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-bold">Demographics</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">{p.gender}, {p.age} years</span>
+                <span className="text-slate-500 dark:text-slate-400 block">Blood: {p.bloodGroup || 'Unknown'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[10px] uppercase font-bold">Contact</span>
-                <span className="font-semibold text-slate-800 font-mono">+91 {p.phone}</span>
-                <span className="text-slate-500 block">{p.village}, {p.district}</span>
+                <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-bold">Contact</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">+91 {p.phone}</span>
+                <span className="text-slate-500 dark:text-slate-400 block">{p.village}, {p.district}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[10px] uppercase font-bold">Destination Facility</span>
-                <span className="font-bold text-purple-900">{referral.facility}</span>
-                <span className="text-purple-700 block font-semibold">{referral.department}</span>
+                <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-bold">Destination Facility</span>
+                <span className="font-bold text-purple-900 dark:text-purple-300">{referral.facility}</span>
+                <span className="text-purple-700 dark:text-purple-400 block font-semibold">{referral.department}</span>
               </div>
             </div>
 
             {/* Clinical Referral Details */}
             <div className="space-y-3 text-xs">
               <div>
-                <h4 className="font-bold text-slate-800 text-sm mb-1">Clinical Reason for Referral:</h4>
-                <p className="p-3 bg-white rounded-lg border border-slate-200 text-slate-700 leading-relaxed">
+                <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm mb-1">Clinical Reason for Referral:</h4>
+                <p className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 leading-relaxed">
                   {referral.reason}
                 </p>
               </div>
 
               {referral.instructions && (
                 <div>
-                  <h4 className="font-bold text-slate-800 text-sm mb-1">Referring Doctor Instructions:</h4>
-                  <p className="p-3 bg-purple-50/50 rounded-lg border border-purple-200 text-purple-900 italic">
+                  <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm mb-1">Referring Doctor Instructions:</h4>
+                  <p className="p-3 bg-purple-50/50 dark:bg-purple-950/30 rounded-lg border border-purple-200 dark:border-purple-800 text-purple-900 dark:text-purple-300 italic">
                     "{referral.instructions}"
                   </p>
                 </div>
@@ -211,10 +211,10 @@ export default function ReferralTokenScanner() {
             </div>
 
             {/* Referral State Machine Action Bar */}
-            <div className="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-slate-500">Current Status:</span>
-                <span className="px-3 py-1 text-xs font-bold rounded-full bg-purple-100 text-purple-900">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Current Status:</span>
+                <span className="px-3 py-1 text-xs font-bold rounded-full bg-purple-100 dark:bg-purple-950/50 text-purple-900 dark:text-purple-200 border border-purple-200 dark:border-purple-800">
                   {referral.status}
                 </span>
               </div>
@@ -244,7 +244,7 @@ export default function ReferralTokenScanner() {
                   <>
                     <Link
                       to={`/hospital/beds?patientId=${p._id || p.id}`}
-                      className="px-4 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl border border-slate-300 flex items-center gap-1.5"
+                      className="px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl border border-slate-300 dark:border-slate-700 flex items-center gap-1.5"
                     >
                       <Bed className="w-3.5 h-3.5 text-blue-600" />
                       Assign Ward Bed
@@ -260,7 +260,7 @@ export default function ReferralTokenScanner() {
                 )}
 
                 {referral.status === 'COMPLETED' && (
-                  <span className="px-4 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center gap-1">
+                  <span className="px-4 py-2 text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                     <CheckCircle className="w-4 h-4 text-emerald-600" /> Treatment Completed
                   </span>
                 )}
