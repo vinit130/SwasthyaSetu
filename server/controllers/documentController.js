@@ -61,26 +61,35 @@ exports.uploadDocument = async (req, res, next) => {
     const hasMultipartFile = Boolean(req.file && req.file.buffer);
     const hasBase64File = Boolean(req.body && req.body.fileData);
 
-    const patientId = req.body?.patientId;
-    const title = req.body?.title;
-    const documentType = req.body?.documentType;
-    const fileName = req.body?.fileName;
-    const fileData = req.body?.fileData;
-    const mimeType = req.body?.mimeType;
-    const fileSize = req.body?.fileSize;
-    const facilityName = req.body?.facilityName;
-    const doctorNotes = req.body?.doctorNotes;
-    const notes = req.body?.notes;
-
-    if (!patientId || !title || (!hasMultipartFile && !hasBase64File)) {
+    // ONLY FILE IS REQUIRED
+    if (!hasMultipartFile && !hasBase64File) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide patient ID, title, and document file.',
+        message: 'Please select or capture a file.',
       });
     }
 
-    // Verify patient exists
-    const patient = await Patient.findById(patientId);
+    // Automatically derive patient context
+    let patientId = req.body?.patientId || req.query?.patientId || req.params?.patientId;
+    if (!patientId && req.user?.role === 'PATIENT') {
+      patientId = req.user?.patientId?.toString();
+    }
+
+    if (!patientId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Active patient context is required for document upload.',
+      });
+    }
+
+    // Verify patient exists (supports MongoDB ObjectId or patient identifier like SS-2026-0001)
+    let patient = null;
+    if (mongoose.Types.ObjectId.isValid(patientId)) {
+      patient = await Patient.findById(patientId);
+    }
+    if (!patient) {
+      patient = await Patient.findOne({ patientId: patientId });
+    }
     if (!patient) {
       return res.status(404).json({
         success: false,
@@ -92,18 +101,20 @@ exports.uploadDocument = async (req, res, next) => {
     let originalName;
     let detectedType;
     let finalFileSize;
+    const fileData = req.body?.fileData;
+    const facilityName = req.body?.facilityName || req.user?.facilityName || '';
 
     if (hasMultipartFile) {
       fileBuffer = req.file.buffer;
-      originalName = req.file.originalname || fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`;
-      detectedType = req.file.mimetype || 'application/pdf';
+      originalName = req.file.originalname || req.body?.fileName || 'medical_document.jpg';
+      detectedType = req.file.mimetype || 'image/jpeg';
       finalFileSize = req.file.size;
     } else {
       const base64Content = fileData.includes(';base64,') ? fileData.split(';base64,')[1] : fileData;
       fileBuffer = Buffer.from(base64Content, 'base64');
-      originalName = fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`;
-      detectedType = mimeType || req.body.fileType || 'application/pdf';
-      finalFileSize = fileSize || fileBuffer.length;
+      originalName = req.body?.fileName || 'medical_document.pdf';
+      detectedType = req.body?.mimeType || req.body?.fileType || 'application/pdf';
+      finalFileSize = req.body?.fileSize || fileBuffer.length;
     }
 
     // Prototype limit guard: 10MB
@@ -114,7 +125,15 @@ exports.uploadDocument = async (req, res, next) => {
       });
     }
 
-    const cleanNotes = doctorNotes || notes || '';
+    // Document title is completely OPTIONAL: if blank, auto-derive from original filename
+    let title = req.body?.title ? req.body.title.trim() : '';
+    if (!title) {
+      const cleanName = originalName.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+      title = cleanName || 'Medical Document';
+    }
+
+    const documentType = req.body?.documentType || 'OTHER';
+    const cleanNotes = req.body?.doctorNotes || req.body?.notes || req.body?.clinicalFindings || '';
     const cleanFileName = supabaseClient.sanitizeFileName(originalName);
     const docId = new mongoose.Types.ObjectId();
 

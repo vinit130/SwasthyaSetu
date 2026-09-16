@@ -8,7 +8,6 @@ import {
   CheckCircle,
   RefreshCw,
   Trash2,
-  Image as ImageIcon,
   FileCheck,
   WifiOff,
 } from 'lucide-react';
@@ -21,20 +20,13 @@ const ALLOWED_MIME_TYPES = [
   'image/webp'
 ];
 
-export const PRIMARY_CATEGORIES = [
+export const DOCUMENT_CATEGORIES = [
   { value: 'PRESCRIPTION', label: 'Prescription' },
   { value: 'LAB_REPORT', label: 'Lab Report' },
-  { value: 'IMAGING', label: 'Imaging' },
+  { value: 'IMAGING', label: 'Imaging (X-Ray / CT / Ultrasound)' },
   { value: 'DISCHARGE_SUMMARY', label: 'Discharge Summary' },
-  { value: 'REFERRAL', label: 'Referral' },
-  { value: 'OTHER', label: 'Other' },
-];
-
-export const IMAGING_SUBTYPES = [
-  { value: 'CT_SCAN', label: 'CT Scan' },
-  { value: 'X_RAY', label: 'X-Ray' },
-  { value: 'ULTRASOUND', label: 'Ultrasound' },
-  { value: 'OTHER_IMAGING', label: 'Other Imaging' },
+  { value: 'REFERRAL', label: 'Referral Document' },
+  { value: 'OTHER', label: 'Other / General Document' },
 ];
 
 // Helper: compress large smartphone camera photos (> 3MB) to ~800KB web-friendly JPEG in memory
@@ -93,27 +85,8 @@ export default function DocumentUploadModal({
   initialCamera = false,
   onUploaded,
 }) {
-  const getAutoTitle = (catVal, subVal) => {
-    let label = 'Prescription';
-    if (catVal === 'IMAGING') {
-      const sub = IMAGING_SUBTYPES.find((s) => s.value === subVal);
-      label = sub ? sub.label : 'Imaging';
-    } else {
-      const cat = PRIMARY_CATEGORIES.find((c) => c.value === catVal);
-      label = cat ? cat.label : 'Prescription';
-    }
-    const date = new Date().toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-    return `${label} — ${date}`;
-  };
-
   const [category, setCategory] = useState('PRESCRIPTION');
-  const [imagingSubtype, setImagingSubtype] = useState('X_RAY');
-  const [title, setTitle] = useState(() => getAutoTitle('PRESCRIPTION', 'X_RAY'));
-  const [isTitleCustomized, setIsTitleCustomized] = useState(false);
+  const [title, setTitle] = useState('');
   const [doctorNotes, setDoctorNotes] = useState('');
 
   // File state
@@ -168,25 +141,11 @@ export default function DocumentUploadModal({
 
   if (!isOpen) return null;
 
-  const handleCategoryChange = (newCat) => {
-    setCategory(newCat);
-    if (!isTitleCustomized) {
-      setTitle(getAutoTitle(newCat, imagingSubtype));
-    }
-  };
-
-  const handleSubtypeChange = (newSub) => {
-    setImagingSubtype(newSub);
-    if (!isTitleCustomized) {
-      setTitle(getAutoTitle('IMAGING', newSub));
-    }
-  };
-
   const handleFileSelection = async (file) => {
     if (!file) return;
 
     if (file.size > 10 * 1024 * 1024) {
-      setError('File size exceeds the 10MB limit. Please capture or choose a smaller file.');
+      setError('File is too large. Maximum allowed size is 10 MB.');
       return;
     }
 
@@ -250,13 +209,9 @@ export default function DocumentUploadModal({
       return;
     }
 
-    if (!title.trim()) {
-      setError('Please provide a document title.');
-      return;
-    }
-
+    // ONLY FILE IS REQUIRED
     if (!rawFile) {
-      setError('Please scan a document with your camera or select a file to upload.');
+      setError('Please select or capture a file before uploading.');
       return;
     }
 
@@ -267,19 +222,22 @@ export default function DocumentUploadModal({
       // Build FormData for multipart streaming
       const formData = new FormData();
       formData.append('file', rawFile);
-      formData.append('patientId', patientId);
-      formData.append('title', title.trim());
-      formData.append(
-        'documentType',
-        category === 'IMAGING' ? imagingSubtype : category
-      );
+      if (patientId) {
+        formData.append('patientId', patientId);
+      }
+      if (title.trim()) {
+        formData.append('title', title.trim());
+      }
+      if (category) {
+        formData.append('documentType', category);
+      }
       if (doctorNotes.trim()) {
-        formData.append('doctorNotes', doctorNotes.trim());
+        formData.append('notes', doctorNotes.trim());
       }
 
       const res = await documentAPI.uploadDocument(formData);
       if (res.data.success) {
-        setSuccessMsg('Document uploaded and securely encrypted.');
+        setSuccessMsg('Document uploaded successfully.');
         if (onUploaded) {
           onUploaded(res.data.data);
         }
@@ -287,7 +245,7 @@ export default function DocumentUploadModal({
           onClose();
         }, 600);
       } else {
-        setError(res.data.message || 'Upload failed. Please check connection and try again.');
+        setError(res.data.message || 'Document upload failed. Please try again.');
       }
     } catch (err) {
       console.error('Document upload error:', err);
@@ -295,9 +253,9 @@ export default function DocumentUploadModal({
         err.response?.data?.message ||
         (err.response?.status === 413
           ? 'File is too large. Maximum allowed size is 10 MB.'
-          : 'Failed to upload document. Please retry without re-scanning.');
+          : 'Document upload failed. Please try again.');
       setError(msg);
-      // NOTE: rawFile is deliberately NOT cleared so doctor can click Retry immediately!
+      // Keep file in state so doctor does not have to re-scan or re-select
     } finally {
       setLoading(false);
     }
@@ -318,7 +276,7 @@ export default function DocumentUploadModal({
         if (e.target === e.currentTarget && !loading) onClose();
       }}
     >
-      <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Modal Header */}
         <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-teal-50/70 via-white to-emerald-50/40">
           <div className="flex items-center gap-3">
@@ -326,9 +284,9 @@ export default function DocumentUploadModal({
               <FileCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">Upload Medical Record</h3>
+              <h3 className="text-base font-bold text-slate-900">Attach Medical Document</h3>
               <p className="text-xs text-slate-500">
-                Patient: <strong className="text-slate-800">{patientName}</strong> • Private patient storage
+                Patient: <strong className="text-slate-800">{patientName}</strong> • Private clinical record
               </p>
             </div>
           </div>
@@ -360,7 +318,7 @@ export default function DocumentUploadModal({
             <button
               type="button"
               onClick={() => setCameraNotice('')}
-              className="text-blue-600 hover:text-blue-900 font-bold ml-2"
+              className="text-blue-600 hover:text-blue-900 font-bold ml-2 cursor-pointer"
             >
               ✕
             </button>
@@ -373,7 +331,7 @@ export default function DocumentUploadModal({
             <div className="p-3 bg-red-50 text-red-700 text-xs rounded-xl flex items-start gap-2 border border-red-200">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
               <div className="flex-1">
-                <span className="font-semibold block mb-0.5">Upload Failed</span>
+                <span className="font-semibold block mb-0.5">Upload Notice</span>
                 <span>{error}</span>
               </div>
             </div>
@@ -386,140 +344,53 @@ export default function DocumentUploadModal({
             </div>
           )}
 
-          {/* 1. Category Selection (6 Clean Primary Buttons) */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              1. Document Category (Click to select)
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {PRIMARY_CATEGORIES.map((cat) => {
-                const isSelected = category === cat.value;
-                return (
-                  <button
-                    key={cat.value}
-                    type="button"
-                    onClick={() => handleCategoryChange(cat.value)}
-                    className={`px-3 py-2 text-xs font-medium rounded-xl border transition-all text-left flex items-center justify-between cursor-pointer ${
-                      isSelected
-                        ? 'bg-teal-600 text-white border-teal-600 shadow-xs font-semibold ring-2 ring-teal-500/20'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-teal-50/60 hover:border-teal-300'
-                    }`}
-                  >
-                    <span>{cat.label}</span>
-                    {isSelected && <CheckCircle className="w-3.5 h-3.5 text-teal-100" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          {/* PRIMARY WORKFLOW: Attach Document / Scan */}
+          {!rawFile ? (
+            <div className="p-6 border-2 border-dashed border-teal-200 hover:border-teal-400 rounded-2xl bg-teal-50/30 transition-colors text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-teal-100/70 text-teal-700 flex items-center justify-center mx-auto shadow-2xs">
+                <UploadCloud className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-800">
+                  Attach Document to Patient Record
+                </p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Supports prescriptions, lab reports, X-rays, scans, and PDFs (Max 10 MB)
+                </p>
+              </div>
 
-          {/* Sub-chips for Imaging */}
-          {category === 'IMAGING' && (
-            <div className="p-3 bg-teal-50/60 rounded-xl border border-teal-200/80 space-y-1.5">
-              <label className="block text-[11px] font-semibold text-teal-900">
-                Imaging Sub-type:
-              </label>
-              <div className="flex flex-wrap gap-1.5">
-                {IMAGING_SUBTYPES.map((sub) => {
-                  const isSelected = imagingSubtype === sub.value;
-                  return (
-                    <button
-                      key={sub.value}
-                      type="button"
-                      onClick={() => handleSubtypeChange(sub.value)}
-                      className={`px-2.5 py-1 text-xs font-medium rounded-lg border transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-teal-700 text-white border-teal-700 shadow-2xs font-semibold'
-                          : 'bg-white text-teal-800 border-teal-300 hover:bg-teal-100/60'
-                      }`}
-                    >
-                      {sub.label}
-                    </button>
-                  );
-                })}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                {/* Primary Camera Button */}
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="w-full sm:w-auto px-5 py-2.5 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+                >
+                  <Camera className="w-4 h-4" />
+                  <span>Scan with Camera</span>
+                </button>
+
+                {/* Primary File Button */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full sm:w-auto px-5 py-2.5 text-xs font-semibold text-teal-800 bg-white hover:bg-teal-50 border border-teal-300 rounded-xl flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer"
+                >
+                  <UploadCloud className="w-4 h-4 text-teal-600" />
+                  <span>Upload Image / PDF</span>
+                </button>
               </div>
             </div>
-          )}
-
-          {/* 2. Document Title */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-semibold text-slate-700">
-                2. Document Title *
-              </label>
-              <span className="text-[10px] text-slate-400">Auto-filled from category</span>
-            </div>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => {
-                setTitle(e.target.value);
-                setIsTitleCustomized(true);
-              }}
-              placeholder="e.g. Prescription — 16 Sep 2026"
-              className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-            />
-          </div>
-
-          {/* 3. Capture or Upload Document Box */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              3. Capture or Attach File *
-            </label>
-
-            {!rawFile ? (
-              <div className="p-5 border-2 border-dashed border-slate-200 hover:border-teal-400 rounded-2xl bg-slate-50/70 transition-colors text-center space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto shadow-2xs">
-                  <UploadCloud className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-slate-800">
-                    Capture document photo or upload digital report
-                  </p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    Supports PDF, JPEG, PNG, WebP (Max 10MB)
-                  </p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1">
-                  {/* Primary Camera Button */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (cameraInputRef.current) {
-                        cameraInputRef.current.click();
-                      }
-                    }}
-                    className="w-full sm:w-auto px-4 py-2 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
-                  >
-                    <Camera className="w-4 h-4" />
-                    <span>Scan with Camera</span>
-                  </button>
-
-                  {/* Primary File Button */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (fileInputRef.current) {
-                        fileInputRef.current.click();
-                      }
-                    }}
-                    className="w-full sm:w-auto px-4 py-2 text-xs font-semibold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-300 rounded-xl flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer"
-                  >
-                    <UploadCloud className="w-4 h-4 text-teal-600" />
-                    <span>Upload Image / PDF</span>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              /* Selected / Captured File Preview Card */
-              <div className="p-4 rounded-2xl border border-teal-200 bg-teal-50/30 space-y-3">
+          ) : (
+            /* PREVIEW CARD: Selected / Captured File */
+            <div className="space-y-4">
+              <div className="p-4 rounded-2xl border border-teal-200 bg-teal-50/40 space-y-3">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-3.5 min-w-0">
                     {isImage && previewUrl ? (
                       <img
                         src={previewUrl}
-                        alt="Captured Document"
+                        alt="Captured Preview"
                         className="w-16 h-16 object-cover rounded-xl border border-slate-300 shadow-xs shrink-0"
                       />
                     ) : (
@@ -538,16 +409,16 @@ export default function DocumentUploadModal({
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500 mt-0.5">
-                        Size: <strong className="text-slate-700">{formatSize(fileSize)}</strong>
+                        Size: <strong className="text-slate-700">{formatSize(fileSize)}</strong> • {isImage ? 'Image' : 'PDF Document'}
                       </p>
                       <p className="text-[10px] text-teal-700 font-medium mt-0.5 flex items-center gap-1">
                         <CheckCircle className="w-3 h-3 text-teal-600" />
-                        <span>Ready for secure patient record storage</span>
+                        <span>Ready to attach to {patientName}'s record</span>
                       </p>
                     </div>
                   </div>
 
-                  {/* Clear Button */}
+                  {/* Remove Button */}
                   <button
                     type="button"
                     onClick={handleClearFile}
@@ -560,7 +431,7 @@ export default function DocumentUploadModal({
 
                 {/* Retake / Change Actions */}
                 <div className="pt-2 border-t border-teal-200/60 flex items-center justify-between">
-                  <span className="text-[11px] text-slate-500">Need to change or retake photo?</span>
+                  <span className="text-[11px] text-slate-500">Need to change or retake?</span>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
@@ -575,52 +446,90 @@ export default function DocumentUploadModal({
                       onClick={() => fileInputRef.current?.click()}
                       className="px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200 flex items-center gap-1 cursor-pointer"
                     >
-                      <span>Choose File</span>
+                      <span>Choose Another</span>
                     </button>
                   </div>
                 </div>
               </div>
-            )}
 
-            {/* Hidden Input Elements */}
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) handleFileSelection(f);
-                e.target.value = '';
-              }}
-              className="hidden"
-            />
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.png,.jpg,.jpeg,.webp,image/*,application/pdf"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) handleFileSelection(f);
-                e.target.value = '';
-              }}
-              className="hidden"
-            />
-          </div>
+              {/* OPTIONAL ORGANIZATION (Document Type, Title, Notes) */}
+              <div className="space-y-3 pt-1">
+                {/* Document Type Dropdown (Optional) */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Document Type (Optional)
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  >
+                    {DOCUMENT_CATEGORIES.map((cat) => (
+                      <option key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-          {/* 4. Clinical Findings / Doctor Remarks (Optional) */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              4. Clinical Findings / Doctor Remarks (Optional)
-            </label>
-            <textarea
-              rows={2}
-              value={doctorNotes}
-              onChange={(e) => setDoctorNotes(e.target.value)}
-              placeholder="e.g. Findings show patchy infiltrates in right lung; review after 5 days of oral antibiotics..."
-              className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-            />
-          </div>
+                {/* Document Title (Optional) */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Document Title (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder={fileName ? fileName.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ') : 'e.g. Prescription — 16 Sep 2026 (Optional)'}
+                    className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-0.5 block">
+                    If left blank, the original filename will be used automatically.
+                  </span>
+                </div>
+
+                {/* Notes / Remarks (Optional) */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Notes / Remarks (Optional)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={doctorNotes}
+                    onChange={(e) => setDoctorNotes(e.target.value)}
+                    placeholder="Add a note if needed (Optional)"
+                    className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Hidden Input Elements */}
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleFileSelection(f);
+              e.target.value = '';
+            }}
+            className="hidden"
+          />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.png,.jpg,.jpeg,.webp,image/*,application/pdf"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleFileSelection(f);
+              e.target.value = '';
+            }}
+            className="hidden"
+          />
         </div>
 
         {/* Modal Footer Actions */}
@@ -643,7 +552,7 @@ export default function DocumentUploadModal({
             {loading ? (
               <>
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                <span>Uploading Record...</span>
+                <span>Uploading Document...</span>
               </>
             ) : isOffline ? (
               'Offline — Connect to Upload'

@@ -2149,34 +2149,44 @@ class MockStore {
     const hasMultipart = Boolean(req.file && req.file.buffer);
     const hasBase64 = Boolean(req.body && req.body.fileData);
 
-    const patientId = req.body?.patientId;
-    const title = req.body?.title;
-    const documentType = req.body?.documentType;
-    const fileName = req.body?.fileName;
-    const fileData = req.body?.fileData;
-    const fileType = req.body?.fileType || req.body?.mimeType;
-    const notes = req.body?.notes;
-    const doctorNotes = req.body?.doctorNotes;
-    const facilityName = req.body?.facilityName;
-    const fileSize = req.body?.fileSize;
-
-    if (!patientId || !title || (!hasMultipart && !hasBase64)) {
+    // ONLY FILE IS REQUIRED
+    if (!hasMultipart && !hasBase64) {
       return res.status(400).json({
         success: false,
-        message: 'Patient ID, document title, and file data are required',
+        message: 'Please select or capture a file.',
       });
     }
 
-    const patient = this.patients.find((p) => p._id === patientId || p.id === patientId);
+    // Automatically derive patient context
+    let patientId = req.body?.patientId || req.query?.patientId;
+    if (!patientId && req.user?.role === 'PATIENT') {
+      patientId = req.user?.patientId?.toString();
+    }
+
+    if (!patientId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Active patient context is required for document upload.',
+      });
+    }
+
+    const patient = this.patients.find(
+      (p) => p._id === patientId || p.patientId === patientId || p.id === patientId
+    );
     if (!patient) {
-      return res.status(404).json({ success: false, message: 'Patient record not found' });
+      return res.status(404).json({ success: false, message: 'Patient record not found.' });
     }
 
     const docId = 'doc_' + Date.now();
-    const originalName = req.file ? req.file.originalname : (fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`);
+    const originalName = req.file
+      ? req.file.originalname
+      : (req.body?.fileName || 'medical_document.jpg');
     const cleanFileName = originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const detectedType = req.file ? req.file.mimetype : (fileType || 'application/pdf');
-    const finalSize = req.file ? req.file.size : (fileSize || 150000);
+    const detectedType = req.file
+      ? req.file.mimetype
+      : (req.body?.fileType || req.body?.mimeType || 'image/jpeg');
+    const finalSize = req.file ? req.file.size : (req.body?.fileSize || 150000);
+    const facilityName = req.body?.facilityName || req.user?.facilityName || 'District Hospital, Aundh, Pune';
 
     if (finalSize > 10 * 1024 * 1024) {
       return res.status(400).json({
@@ -2185,9 +2195,19 @@ class MockStore {
       });
     }
 
-    const cleanNotes = doctorNotes || notes || '';
+    // Document title is completely OPTIONAL: auto-derive if not provided
+    let title = req.body?.title ? req.body.title.trim() : '';
+    if (!title) {
+      const cleanName = originalName.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+      title = cleanName || 'Medical Document';
+    }
+
+    const documentType = req.body?.documentType || 'OTHER';
+    const cleanNotes = req.body?.doctorNotes || req.body?.notes || req.body?.clinicalFindings || '';
     const hasSupabase = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
-    const finalFileData = req.file ? `data:${detectedType};base64,${req.file.buffer.toString('base64')}` : fileData;
+    const finalFileData = req.file
+      ? `data:${detectedType};base64,${req.file.buffer.toString('base64')}`
+      : req.body?.fileData;
 
     const newDoc = {
       _id: docId,

@@ -7,12 +7,17 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add Bearer token
+// Request interceptor to add Bearer token and handle FormData
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('swasthyasetu_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // CRITICAL: When sending FormData, delete Content-Type so Axios and the browser
+    // generate the correct multipart/form-data boundary automatically!
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
     }
     return config;
   },
