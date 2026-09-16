@@ -2146,9 +2146,21 @@ class MockStore {
 
   // --- Document Handlers ---
   uploadDocument(req, res) {
-    const { patientId, title, documentType, fileData, fileName, fileType, notes, doctorNotes, facilityName, fileSize } = req.body;
+    const hasMultipart = Boolean(req.file && req.file.buffer);
+    const hasBase64 = Boolean(req.body && req.body.fileData);
 
-    if (!patientId || !title || !fileData) {
+    const patientId = req.body?.patientId;
+    const title = req.body?.title;
+    const documentType = req.body?.documentType;
+    const fileName = req.body?.fileName;
+    const fileData = req.body?.fileData;
+    const fileType = req.body?.fileType || req.body?.mimeType;
+    const notes = req.body?.notes;
+    const doctorNotes = req.body?.doctorNotes;
+    const facilityName = req.body?.facilityName;
+    const fileSize = req.body?.fileSize;
+
+    if (!patientId || !title || (!hasMultipart && !hasBase64)) {
       return res.status(400).json({
         success: false,
         message: 'Patient ID, document title, and file data are required',
@@ -2161,9 +2173,21 @@ class MockStore {
     }
 
     const docId = 'doc_' + Date.now();
-    const cleanFileName = fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`;
+    const originalName = req.file ? req.file.originalname : (fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`);
+    const cleanFileName = originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const detectedType = req.file ? req.file.mimetype : (fileType || 'application/pdf');
+    const finalSize = req.file ? req.file.size : (fileSize || 150000);
+
+    if (finalSize > 10 * 1024 * 1024) {
+      return res.status(400).json({
+        success: false,
+        message: 'File is too large. Maximum allowed size is 10 MB.',
+      });
+    }
+
     const cleanNotes = doctorNotes || notes || '';
     const hasSupabase = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const finalFileData = req.file ? `data:${detectedType};base64,${req.file.buffer.toString('base64')}` : fileData;
 
     const newDoc = {
       _id: docId,
@@ -2175,13 +2199,13 @@ class MockStore {
       documentType: documentType || 'PRESCRIPTION',
       title: title.trim(),
       fileName: cleanFileName,
-      originalFileName: cleanFileName,
+      originalFileName: originalName,
       storagePath: `${patient._id}/${docId}/${cleanFileName}`,
       storageProvider: hasSupabase ? 'SUPABASE' : 'LOCAL_FALLBACK',
-      fileType: fileType || 'application/pdf',
-      mimeType: fileType || 'application/pdf',
-      fileSize: fileSize || 150000,
-      fileData, // Encoded data URI
+      fileType: detectedType,
+      mimeType: detectedType,
+      fileSize: finalSize,
+      fileData: finalFileData,
       notes: cleanNotes,
       doctorNotes: cleanNotes,
       createdAt: new Date().toISOString(),

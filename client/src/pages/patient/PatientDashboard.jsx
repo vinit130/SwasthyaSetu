@@ -156,33 +156,33 @@ export default function PatientDashboard() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Patient Welcome Header */}
-      <Card className="p-6 bg-linear-to-r from-teal-700 to-emerald-800 text-white border-none shadow-md">
+      <Card className="p-6 bg-gradient-to-r from-teal-900 via-teal-800 to-emerald-900 text-white border-none shadow-lg">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-xs flex items-center justify-center font-bold text-2xl text-white border border-white/20">
+            <div className="w-14 h-14 rounded-2xl bg-teal-700/60 flex items-center justify-center font-bold text-2xl text-white border border-white/30 shadow-inner shrink-0">
               {patient.name[0]?.toUpperCase()}
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-bold">{patient.name}</h1>
-                <span className="text-xs bg-white/20 text-white px-2.5 py-0.5 rounded-full font-medium">
+                <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{patient.name}</h1>
+                <span className="text-xs bg-white/20 text-white px-2.5 py-0.5 rounded-full font-semibold border border-white/20">
                   {patient.gender}, {patient.age} yrs
                 </span>
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs text-teal-100 mt-1.5">
-                <span className="font-mono bg-black/20 px-2 py-0.5 rounded text-white font-semibold">
+                <span className="font-mono bg-black/30 px-2.5 py-0.5 rounded-md text-white font-bold tracking-wide border border-white/15">
                   ID: {patient.patientId}
                 </span>
                 <span>•</span>
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5" />
+                <span className="flex items-center gap-1 text-teal-100 font-medium">
+                  <MapPin className="w-3.5 h-3.5 text-teal-200" />
                   {patient.village}, {patient.district}
                 </span>
                 {patient.phone && (
                   <>
                     <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <Phone className="w-3.5 h-3.5" />
+                    <span className="flex items-center gap-1 text-teal-100 font-medium">
+                      <Phone className="w-3.5 h-3.5 text-teal-200" />
                       {patient.phone}
                     </span>
                   </>
@@ -191,11 +191,11 @@ export default function PatientDashboard() {
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-xs p-3 rounded-xl border border-white/20 text-right sm:text-right">
-            <span className="text-[11px] text-teal-100 uppercase tracking-wider block font-semibold">
+          <div className="bg-white/15 backdrop-blur-sm p-3.5 rounded-xl border border-white/25 text-left sm:text-right shrink-0">
+            <span className="text-[11px] text-teal-100 uppercase tracking-wider block font-bold">
               {t('doctorConfirmedStatus')}
             </span>
-            <div className="mt-1">
+            <div className="mt-1.5 flex items-center sm:justify-end">
               <Badge type="risk" value={currentRisk || 'GREEN'} />
             </div>
           </div>

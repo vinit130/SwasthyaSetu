@@ -58,23 +58,24 @@ exports.uploadDocument = async (req, res, next) => {
     return mockStore.uploadDocument(req, res);
   }
   try {
-    const {
-      patientId,
-      title,
-      documentType,
-      fileName,
-      fileData,
-      mimeType,
-      fileSize,
-      facilityName,
-      doctorNotes,
-      notes,
-    } = req.body;
+    const hasMultipartFile = Boolean(req.file && req.file.buffer);
+    const hasBase64File = Boolean(req.body && req.body.fileData);
 
-    if (!patientId || !title || !documentType || !fileData) {
+    const patientId = req.body?.patientId;
+    const title = req.body?.title;
+    const documentType = req.body?.documentType;
+    const fileName = req.body?.fileName;
+    const fileData = req.body?.fileData;
+    const mimeType = req.body?.mimeType;
+    const fileSize = req.body?.fileSize;
+    const facilityName = req.body?.facilityName;
+    const doctorNotes = req.body?.doctorNotes;
+    const notes = req.body?.notes;
+
+    if (!patientId || !title || (!hasMultipartFile && !hasBase64File)) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide patient ID, title, document type, and file data.',
+        message: 'Please provide patient ID, title, and document file.',
       });
     }
 
@@ -87,31 +88,53 @@ exports.uploadDocument = async (req, res, next) => {
       });
     }
 
-    const detectedType = mimeType || req.body.fileType || 'application/pdf';
+    let fileBuffer;
+    let originalName;
+    let detectedType;
+    let finalFileSize;
+
+    if (hasMultipartFile) {
+      fileBuffer = req.file.buffer;
+      originalName = req.file.originalname || fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`;
+      detectedType = req.file.mimetype || 'application/pdf';
+      finalFileSize = req.file.size;
+    } else {
+      const base64Content = fileData.includes(';base64,') ? fileData.split(';base64,')[1] : fileData;
+      fileBuffer = Buffer.from(base64Content, 'base64');
+      originalName = fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`;
+      detectedType = mimeType || req.body.fileType || 'application/pdf';
+      finalFileSize = fileSize || fileBuffer.length;
+    }
+
+    // Prototype limit guard: 10MB
+    if (finalFileSize > 10 * 1024 * 1024) {
+      return res.status(400).json({
+        success: false,
+        message: 'File is too large. Maximum allowed size is 10 MB.',
+      });
+    }
+
     const cleanNotes = doctorNotes || notes || '';
-    const cleanFileName = supabaseClient.sanitizeFileName(fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`);
+    const cleanFileName = supabaseClient.sanitizeFileName(originalName);
     const docId = new mongoose.Types.ObjectId();
 
     let storagePath = null;
     let storageProvider = 'LOCAL_FALLBACK';
-    let savedFileData = fileData;
+    let savedFileData = hasBase64File ? fileData : `data:${detectedType};base64,${fileBuffer.toString('base64')}`;
 
     // Check if real Supabase Storage is configured
     if (supabaseClient.isSupabaseConfigured()) {
       try {
-        const base64Content = fileData.includes(';base64,') ? fileData.split(';base64,')[1] : fileData;
-        const fileBuffer = Buffer.from(base64Content, 'base64');
         const targetPath = supabaseClient.buildStoragePath(patientId, docId, cleanFileName);
-
         const uploadResult = await supabaseClient.uploadToSupabase(targetPath, fileBuffer, detectedType);
         storagePath = uploadResult.storagePath;
         storageProvider = 'SUPABASE';
-        savedFileData = undefined; // Drop heavy binary from MongoDB
+        savedFileData = undefined; // Drop heavy binary from MongoDB when in Supabase
         console.log(`[Supabase Storage] Successfully uploaded document to ${storagePath}`);
       } catch (uploadErr) {
         console.warn('[Supabase Storage] Upload failed, falling back to database storage:', uploadErr.message);
         storageProvider = 'LOCAL_FALLBACK';
-        savedFileData = fileData;
+        savedFileData = hasBase64File ? fileData : `data:${detectedType};base64,${fileBuffer.toString('base64')}`;
       }
     } else {
       console.log('[DocumentStorage] Supabase unconfigured; persisting in local portable store.');
@@ -121,15 +144,15 @@ exports.uploadDocument = async (req, res, next) => {
       _id: docId,
       patientId,
       title: title.trim(),
-      documentType: documentType === 'SCAN_XRAY' ? 'DIAGNOSTIC_SCAN' : documentType,
+      documentType: documentType || 'PRESCRIPTION',
       fileName: cleanFileName,
-      originalFileName: fileName || cleanFileName,
+      originalFileName: originalName,
       storagePath,
       storageProvider,
       fileData: savedFileData,
       fileType: detectedType,
       mimeType: detectedType,
-      fileSize: fileSize || Math.round(fileData.length * 0.75),
+      fileSize: finalFileSize,
       facilityName: facilityName || req.user.facilityName || '',
       uploadedBy: req.user._id || req.user.id,
       uploaderRole: req.user.role,

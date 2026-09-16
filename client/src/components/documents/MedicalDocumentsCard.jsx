@@ -97,7 +97,7 @@ export default function MedicalDocumentsCard({
   return (
     <div className={`bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-linear-to-r from-teal-50/40 via-white to-indigo-50/20">
+      <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-teal-50/40 via-white to-indigo-50/20">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-xs shrink-0">
             <FileText className="w-5 h-5" />

@@ -85,7 +85,7 @@ export default function DoctorDashboard() {
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-4 bg-linear-to-br from-white via-white to-amber-50/40 border-slate-200/90 border-t-4 border-t-amber-500 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+          <Card className="p-4 bg-gradient-to-br from-white via-white to-amber-50/40 border-slate-200/90 border-t-4 border-t-amber-500 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between text-slate-500 mb-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('patientsAwaitingReview')}</span>
               <div className="w-8 h-8 rounded-xl bg-amber-100/70 text-amber-800 flex items-center justify-center shadow-xs">
@@ -98,7 +98,7 @@ export default function DoctorDashboard() {
             <p className="text-[11px] text-amber-700 font-medium mt-1">Frontline triage queue</p>
           </Card>
 
-          <Card className="p-4 bg-linear-to-br from-white via-white to-teal-50/40 border-slate-200/90 border-t-4 border-t-teal-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+          <Card className="p-4 bg-gradient-to-br from-white via-white to-teal-50/40 border-slate-200/90 border-t-4 border-t-teal-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between text-slate-500 mb-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('todayConsultations')}</span>
               <div className="w-8 h-8 rounded-xl bg-teal-100/70 text-teal-800 flex items-center justify-center shadow-xs">
@@ -111,7 +111,7 @@ export default function DoctorDashboard() {
             <p className="text-[11px] text-teal-700 font-medium mt-1">Confirmed reviews</p>
           </Card>
 
-          <Card className="p-4 bg-linear-to-br from-white via-white to-indigo-50/40 border-slate-200/90 border-t-4 border-t-indigo-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+          <Card className="p-4 bg-gradient-to-br from-white via-white to-indigo-50/40 border-slate-200/90 border-t-4 border-t-indigo-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between text-slate-500 mb-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('activeReferrals')}</span>
               <div className="w-8 h-8 rounded-xl bg-indigo-100/70 text-indigo-800 flex items-center justify-center shadow-xs">
@@ -124,7 +124,7 @@ export default function DoctorDashboard() {
             <p className="text-[11px] text-indigo-700 font-medium mt-1">Active transfers</p>
           </Card>
 
-          <Card className="p-4 bg-linear-to-br from-white via-white to-sky-50/40 border-slate-200/90 border-t-4 border-t-sky-500 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+          <Card className="p-4 bg-gradient-to-br from-white via-white to-sky-50/40 border-slate-200/90 border-t-4 border-t-sky-500 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between text-slate-500 mb-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('upcomingFollowups')}</span>
               <div className="w-8 h-8 rounded-xl bg-sky-100/70 text-sky-800 flex items-center justify-center shadow-xs">

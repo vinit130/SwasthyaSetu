@@ -15,8 +15,9 @@ const app = express();
 const path = require('path');
 const fs = require('fs');
 
-// Body parser
-app.use(express.json());
+// Body parser with 10MB prototype limit
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Enable CORS for frontend and deployment domains
 app.use(

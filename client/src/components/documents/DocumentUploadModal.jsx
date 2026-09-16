@@ -6,9 +6,9 @@ import {
   FileText,
   AlertCircle,
   CheckCircle,
-  Plus,
+  RefreshCw,
   Trash2,
-  Image,
+  Image as ImageIcon,
   FileCheck,
   WifiOff,
 } from 'lucide-react';
@@ -21,30 +21,87 @@ const ALLOWED_MIME_TYPES = [
   'image/webp'
 ];
 
-export const DOCUMENT_CATEGORIES = [
+export const PRIMARY_CATEGORIES = [
   { value: 'PRESCRIPTION', label: 'Prescription' },
   { value: 'LAB_REPORT', label: 'Lab Report' },
-  { value: 'BLOOD_TEST', label: 'Blood Test' },
-  { value: 'IMAGING_REPORT', label: 'Imaging Report' },
+  { value: 'IMAGING', label: 'Imaging' },
+  { value: 'DISCHARGE_SUMMARY', label: 'Discharge Summary' },
+  { value: 'REFERRAL', label: 'Referral' },
+  { value: 'OTHER', label: 'Other' },
+];
+
+export const IMAGING_SUBTYPES = [
   { value: 'CT_SCAN', label: 'CT Scan' },
   { value: 'X_RAY', label: 'X-Ray' },
   { value: 'ULTRASOUND', label: 'Ultrasound' },
-  { value: 'DISCHARGE_SUMMARY', label: 'Discharge Summary' },
-  { value: 'REFERRAL_SLIP', label: 'Referral Document' },
-  { value: 'OTHER', label: 'Other' },
+  { value: 'OTHER_IMAGING', label: 'Other Imaging' },
 ];
+
+// Helper: compress large smartphone camera photos (> 3MB) to ~800KB web-friendly JPEG in memory
+const compressImageIfNeeded = async (file) => {
+  if (!file.type || !file.type.startsWith('image/')) return file;
+  if (file.size <= 3 * 1024 * 1024) return file;
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement('canvas');
+      const maxDim = 2048;
+      let width = img.width;
+      let height = img.height;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return resolve(file);
+          const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.jpg'), {
+            type: 'image/jpeg',
+            lastModified: Date.now(),
+          });
+          resolve(compressedFile);
+        },
+        'image/jpeg',
+        0.85
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(file);
+    };
+    img.src = url;
+  });
+};
 
 export default function DocumentUploadModal({
   isOpen,
   onClose,
   patientId,
-  patientName,
+  patientName = 'Patient',
   initialCamera = false,
   onUploaded,
 }) {
-  const getAutoTitle = (catVal) => {
-    const cat = DOCUMENT_CATEGORIES.find((c) => c.value === catVal);
-    const label = cat ? cat.label : 'Prescription';
+  const getAutoTitle = (catVal, subVal) => {
+    let label = 'Prescription';
+    if (catVal === 'IMAGING') {
+      const sub = IMAGING_SUBTYPES.find((s) => s.value === subVal);
+      label = sub ? sub.label : 'Imaging';
+    } else {
+      const cat = PRIMARY_CATEGORIES.find((c) => c.value === catVal);
+      label = cat ? cat.label : 'Prescription';
+    }
     const date = new Date().toLocaleDateString('en-IN', {
       day: 'numeric',
       month: 'short',
@@ -53,22 +110,19 @@ export default function DocumentUploadModal({
     return `${label} — ${date}`;
   };
 
-  // We maintain a list of documents to upload in a queue
-  const [documentsQueue, setDocumentsQueue] = useState([
-    {
-      id: Date.now(),
-      title: getAutoTitle('PRESCRIPTION'),
-      documentType: 'PRESCRIPTION',
-      fileData: '',
-      fileName: '',
-      mimeType: 'application/pdf',
-      fileSize: 0,
-      previewUrl: '',
-      doctorNotes: '',
-    }
-  ]);
+  const [category, setCategory] = useState('PRESCRIPTION');
+  const [imagingSubtype, setImagingSubtype] = useState('X_RAY');
+  const [title, setTitle] = useState(() => getAutoTitle('PRESCRIPTION', 'X_RAY'));
+  const [isTitleCustomized, setIsTitleCustomized] = useState(false);
+  const [doctorNotes, setDoctorNotes] = useState('');
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  // File state
+  const [rawFile, setRawFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [fileName, setFileName] = useState('');
+  const [fileSize, setFileSize] = useState(0);
+  const [isImage, setIsImage] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -89,205 +143,200 @@ export default function DocumentUploadModal({
     };
   }, []);
 
+  // Cleanup object URL on unmount or file change
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  // Initial camera trigger if launched via "Scan with Camera"
   useEffect(() => {
     if (isOpen && initialCamera && cameraInputRef.current) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         try {
           cameraInputRef.current?.click();
-        } catch {
-          setCameraNotice('Camera access was not allowed. You can upload a photo or PDF instead.');
+        } catch (err) {
+          setCameraNotice('Camera access was not granted. You can attach a photo or PDF file below.');
         }
-      }, 150);
+      }, 200);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, initialCamera]);
 
   if (!isOpen) return null;
 
-  const currentDoc = documentsQueue[activeIndex] || documentsQueue[0];
-
-  const updateCurrentDoc = (field, value) => {
-    setDocumentsQueue(prev => prev.map((doc, idx) => idx === activeIndex ? { ...doc, [field]: value } : doc));
+  const handleCategoryChange = (newCat) => {
+    setCategory(newCat);
+    if (!isTitleCustomized) {
+      setTitle(getAutoTitle(newCat, imagingSubtype));
+    }
   };
 
-  const handleCategorySelect = (catVal) => {
-    const autoTitle = getAutoTitle(catVal);
-    setDocumentsQueue(prev => prev.map((doc, idx) => {
-      if (idx === activeIndex) {
-        const shouldUpdate = !doc.title || DOCUMENT_CATEGORIES.some(c => doc.title.startsWith(c.label));
-        return {
-          ...doc,
-          documentType: catVal,
-          title: shouldUpdate ? autoTitle : doc.title,
-        };
-      }
-      return doc;
-    }));
+  const handleSubtypeChange = (newSub) => {
+    setImagingSubtype(newSub);
+    if (!isTitleCustomized) {
+      setTitle(getAutoTitle('IMAGING', newSub));
+    }
   };
 
-  const processFile = (file) => {
+  const handleFileSelection = async (file) => {
     if (!file) return;
 
     if (file.size > 10 * 1024 * 1024) {
-      setError('File size exceeds the 10MB limit. Please choose a smaller file.');
+      setError('File size exceeds the 10MB limit. Please capture or choose a smaller file.');
       return;
     }
 
-    const type = file.type || 'application/pdf';
-    if (!ALLOWED_MIME_TYPES.includes(type) && !file.name.match(/\.(pdf|jpe?g|png|webp)$/i)) {
-      setError('Unsupported file type. Only PDF, JPEG, PNG, and WebP documents are accepted.');
+    const type = file.type || '';
+    const isImg = type.startsWith('image/') || /\.(jpe?g|png|webp)$/i.test(file.name);
+    const isPdf = type === 'application/pdf' || /\.pdf$/i.test(file.name);
+
+    if (!isImg && !isPdf) {
+      setError('Unsupported file format. Please attach a PDF or image (JPEG, PNG, WebP).');
       return;
     }
 
     setError('');
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUri = reader.result;
-      setDocumentsQueue(prev => prev.map((doc, idx) => {
-        if (idx === activeIndex) {
-          return {
-            ...doc,
-            fileData: dataUri,
-            fileName: file.name,
-            mimeType: type,
-            fileSize: file.size,
-            previewUrl: type.startsWith('image') ? dataUri : '',
-            title: doc.title || file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' '),
-          };
-        }
-        return doc;
-      }));
-    };
-    reader.onerror = () => {
-      setError('Failed to read file from disk.');
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      processFile(file);
-      e.target.value = '';
-    }
-  };
-
-  const handleAddAnother = () => {
-    const newDoc = {
-      id: Date.now() + Math.random(),
-      title: '',
-      documentType: 'LAB_REPORT',
-      fileData: '',
-      fileName: '',
-      mimeType: 'application/pdf',
-      fileSize: 0,
-      previewUrl: '',
-      doctorNotes: '',
-    };
-    setDocumentsQueue(prev => [...prev, newDoc]);
-    setActiveIndex(documentsQueue.length);
-  };
-
-  const handleRemoveDoc = (indexToRemove) => {
-    if (documentsQueue.length === 1) {
-      // Reset the single item
-      setDocumentsQueue([{
-        id: Date.now(),
-        title: '',
-        documentType: 'PRESCRIPTION',
-        fileData: '',
-        fileName: '',
-        mimeType: 'application/pdf',
-        fileSize: 0,
-        previewUrl: '',
-        doctorNotes: '',
-      }]);
-      return;
-    }
-
-    setDocumentsQueue(prev => prev.filter((_, idx) => idx !== indexToRemove));
-    if (activeIndex >= indexToRemove && activeIndex > 0) {
-      setActiveIndex(activeIndex - 1);
-    }
-  };
-
-  const handleSubmitAll = async (e) => {
-    e.preventDefault();
-
-    if (isOffline) {
-      setError('Document upload requires an internet connection. Your other offline data can continue to be saved.');
-      return;
-    }
-
-    // Validate that all documents have title and fileData
-    for (let i = 0; i < documentsQueue.length; i++) {
-      const doc = documentsQueue[i];
-      if (!doc.title.trim()) {
-        setActiveIndex(i);
-        setError(`Please provide a title for Document #${i + 1}`);
-        return;
-      }
-      if (!doc.fileData) {
-        setActiveIndex(i);
-        setError(`Please attach or scan a file for Document #${i + 1} ("${doc.title}")`);
-        return;
-      }
-    }
-
     setLoading(true);
-    setError('');
-    const uploadedDocs = [];
 
     try {
-      for (const doc of documentsQueue) {
-        const res = await documentAPI.uploadDocument({
-          patientId,
-          title: doc.title.trim(),
-          documentType: doc.documentType,
-          fileName: doc.fileName,
-          fileData: doc.fileData,
-          mimeType: doc.mimeType,
-          fileSize: doc.fileSize,
-          doctorNotes: doc.doctorNotes.trim(),
-        });
-        if (res.data.success) {
-          uploadedDocs.push(res.data.data);
-        }
+      let finalFile = file;
+      if (isImg) {
+        finalFile = await compressImageIfNeeded(file);
       }
 
-      setSuccessMsg('Document uploaded successfully.');
-      if (onUploaded) {
-        uploadedDocs.forEach(d => onUploaded(d));
+      setRawFile(finalFile);
+      setFileName(finalFile.name || (isImg ? 'camera_scan.jpg' : 'document.pdf'));
+      setFileSize(finalFile.size);
+      setIsImage(isImg);
+
+      // Create preview
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
       }
-      setTimeout(() => {
-        onClose();
-      }, 700);
+      if (isImg) {
+        const url = URL.createObjectURL(finalFile);
+        setPreviewUrl(url);
+      } else {
+        setPreviewUrl('');
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to complete document upload. Please try again.');
+      console.error('File preparation error:', err);
+      setError('Failed to process the chosen file. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleClearFile = () => {
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setRawFile(null);
+    setPreviewUrl('');
+    setFileName('');
+    setFileSize(0);
+    setIsImage(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
+  };
+
+  const handleUploadSubmit = async () => {
+    if (isOffline) {
+      setError('Document upload requires an internet connection. Your other offline data can continue to be saved.');
+      return;
+    }
+
+    if (!title.trim()) {
+      setError('Please provide a document title.');
+      return;
+    }
+
+    if (!rawFile) {
+      setError('Please scan a document with your camera or select a file to upload.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      // Build FormData for multipart streaming
+      const formData = new FormData();
+      formData.append('file', rawFile);
+      formData.append('patientId', patientId);
+      formData.append('title', title.trim());
+      formData.append(
+        'documentType',
+        category === 'IMAGING' ? imagingSubtype : category
+      );
+      if (doctorNotes.trim()) {
+        formData.append('doctorNotes', doctorNotes.trim());
+      }
+
+      const res = await documentAPI.uploadDocument(formData);
+      if (res.data.success) {
+        setSuccessMsg('Document uploaded and securely encrypted.');
+        if (onUploaded) {
+          onUploaded(res.data.data);
+        }
+        setTimeout(() => {
+          onClose();
+        }, 600);
+      } else {
+        setError(res.data.message || 'Upload failed. Please check connection and try again.');
+      }
+    } catch (err) {
+      console.error('Document upload error:', err);
+      const msg =
+        err.response?.data?.message ||
+        (err.response?.status === 413
+          ? 'File is too large. Maximum allowed size is 10 MB.'
+          : 'Failed to upload document. Please retry without re-scanning.');
+      setError(msg);
+      // NOTE: rawFile is deliberately NOT cleared so doctor can click Retry immediately!
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatSize = (bytes) => {
+    if (!bytes) return '0 B';
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
-      <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !loading) onClose();
+      }}
+    >
+      <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Modal Header */}
-        <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-teal-50/60 to-white">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-xs">
+        <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-teal-50/70 via-white to-emerald-50/40">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-xs shrink-0">
               <FileCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">Upload Medical Records</h3>
+              <h3 className="text-base font-bold text-slate-900">Upload Medical Record</h3>
               <p className="text-xs text-slate-500">
-                Patient: <strong className="text-slate-800">{patientName}</strong> ({documentsQueue.length} {documentsQueue.length === 1 ? 'file' : 'files'} in queue)
+                Patient: <strong className="text-slate-800">{patientName}</strong> • Private patient storage
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            disabled={loading}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -295,7 +344,7 @@ export default function DocumentUploadModal({
 
         {/* Offline Warning Banner */}
         {isOffline && (
-          <div className="bg-amber-50 border-b border-amber-200 px-5 py-2.5 flex items-center gap-2 text-amber-800 text-xs font-medium">
+          <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 flex items-center gap-2 text-amber-800 text-xs font-medium">
             <WifiOff className="w-4 h-4 text-amber-600 shrink-0" />
             <span>Document upload requires an internet connection. Your other offline data can continue to be saved.</span>
           </div>
@@ -303,7 +352,7 @@ export default function DocumentUploadModal({
 
         {/* Camera Notice Banner */}
         {cameraNotice && (
-          <div className="bg-blue-50 border-b border-blue-200 px-5 py-2.5 flex items-center justify-between text-blue-800 text-xs font-medium">
+          <div className="bg-blue-50 border-b border-blue-200 px-4 py-2 flex items-center justify-between text-blue-800 text-xs">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-blue-600 shrink-0" />
               <span>{cameraNotice}</span>
@@ -311,260 +360,301 @@ export default function DocumentUploadModal({
             <button
               type="button"
               onClick={() => setCameraNotice('')}
-              className="text-blue-600 hover:text-blue-900 ml-2 font-bold"
+              className="text-blue-600 hover:text-blue-900 font-bold ml-2"
             >
               ✕
             </button>
           </div>
         )}
 
-        {/* Multi-Document Queue Tabs */}
-        <div className="bg-slate-50 px-5 py-2.5 border-b border-slate-200 flex items-center gap-2 overflow-x-auto">
-          {documentsQueue.map((doc, idx) => (
-            <div
-              key={doc.id}
-              onClick={() => { setActiveIndex(idx); setError(''); }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all border shrink-0 ${
-                activeIndex === idx
-                  ? 'bg-teal-600 text-white border-teal-600 shadow-xs'
-                  : 'bg-white text-slate-700 border-slate-200 hover:border-teal-300'
-              }`}
-            >
-              <span>#{idx + 1} {doc.title ? (doc.title.length > 16 ? doc.title.slice(0, 16) + '...' : doc.title) : 'New Document'}</span>
-              {doc.fileData && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>}
-              {documentsQueue.length > 1 && (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); handleRemoveDoc(idx); }}
-                  className="ml-1 hover:text-red-200"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-            </div>
-          ))}
-
-          <button
-            type="button"
-            onClick={handleAddAnother}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 transition-colors shrink-0"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Add Another</span>
-          </button>
-        </div>
-
-        {/* Active Document Form Body */}
-        <form onSubmit={handleSubmitAll} className="p-5 space-y-4 overflow-y-auto flex-1">
+        {/* Modal Scrollable Body */}
+        <div className="p-5 space-y-4 overflow-y-auto flex-1">
           {error && (
-            <div className="p-3 bg-red-50 text-red-700 text-xs rounded-xl flex items-center gap-2 border border-red-200">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
+            <div className="p-3 bg-red-50 text-red-700 text-xs rounded-xl flex items-start gap-2 border border-red-200">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
+              <div className="flex-1">
+                <span className="font-semibold block mb-0.5">Upload Failed</span>
+                <span>{error}</span>
+              </div>
             </div>
           )}
 
           {successMsg && (
             <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl flex items-center gap-2 border border-emerald-200">
               <CheckCircle className="w-4 h-4 shrink-0 text-emerald-600" />
-              <span>{successMsg}</span>
+              <span className="font-medium">{successMsg}</span>
             </div>
           )}
 
-          {/* Category Chips Selection */}
+          {/* 1. Category Selection (6 Clean Primary Buttons) */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Select Document Category (Click to choose & auto-fill title)
+              1. Document Category (Click to select)
             </label>
-            <div className="flex flex-wrap gap-1.5">
-              {DOCUMENT_CATEGORIES.map((cat) => {
-                const isSelected = currentDoc.documentType === cat.value;
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {PRIMARY_CATEGORIES.map((cat) => {
+                const isSelected = category === cat.value;
                 return (
                   <button
                     key={cat.value}
                     type="button"
-                    onClick={() => handleCategorySelect(cat.value)}
-                    className={`px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all border ${
+                    onClick={() => handleCategoryChange(cat.value)}
+                    className={`px-3 py-2 text-xs font-medium rounded-xl border transition-all text-left flex items-center justify-between cursor-pointer ${
                       isSelected
-                        ? 'bg-teal-600 text-white border-teal-600 shadow-xs font-semibold'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-teal-50 hover:border-teal-300'
+                        ? 'bg-teal-600 text-white border-teal-600 shadow-xs font-semibold ring-2 ring-teal-500/20'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-teal-50/60 hover:border-teal-300'
                     }`}
                   >
-                    {cat.label}
+                    <span>{cat.label}</span>
+                    {isSelected && <CheckCircle className="w-3.5 h-3.5 text-teal-100" />}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Title */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Document Title *
+          {/* Sub-chips for Imaging */}
+          {category === 'IMAGING' && (
+            <div className="p-3 bg-teal-50/60 rounded-xl border border-teal-200/80 space-y-1.5">
+              <label className="block text-[11px] font-semibold text-teal-900">
+                Imaging Sub-type:
               </label>
-              <input
-                type="text"
-                placeholder={currentDoc.documentType === 'OTHER' ? 'Enter document title...' : 'e.g. Blood Test — 16 Sep 2026'}
-                value={currentDoc.title}
-                onChange={(e) => updateCurrentDoc('title', e.target.value)}
-                className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                required
-              />
+              <div className="flex flex-wrap gap-1.5">
+                {IMAGING_SUBTYPES.map((sub) => {
+                  const isSelected = imagingSubtype === sub.value;
+                  return (
+                    <button
+                      key={sub.value}
+                      type="button"
+                      onClick={() => handleSubtypeChange(sub.value)}
+                      className={`px-2.5 py-1 text-xs font-medium rounded-lg border transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-teal-700 text-white border-teal-700 shadow-2xs font-semibold'
+                          : 'bg-white text-teal-800 border-teal-300 hover:bg-teal-100/60'
+                      }`}
+                    >
+                      {sub.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+          )}
 
-            {/* Document Category Dropdown (secondary selector) */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Clinical Category Dropdown
+          {/* 2. Document Title */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold text-slate-700">
+                2. Document Title *
               </label>
-              <select
-                value={currentDoc.documentType}
-                onChange={(e) => handleCategorySelect(e.target.value)}
-                className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-              >
-                {DOCUMENT_CATEGORIES.map(cat => (
-                  <option key={cat.value} value={cat.value}>{cat.label}</option>
-                ))}
-              </select>
+              <span className="text-[10px] text-slate-400">Auto-filled from category</span>
             </div>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                setIsTitleCustomized(true);
+              }}
+              placeholder="e.g. Prescription — 16 Sep 2026"
+              className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+            />
           </div>
 
-          {/* Upload / Camera Action Box */}
-          <div className="p-4 border-2 border-dashed border-slate-200 hover:border-teal-400 rounded-xl bg-slate-50/60 transition-colors">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold text-slate-800">
-                  {currentDoc.fileName ? `Selected: ${currentDoc.fileName}` : 'Attach Document or Scan'}
-                </p>
-                <p className="text-[11px] text-slate-500">
-                  Accepts PDF, JPEG, PNG, WebP (Max 10MB per file)
-                </p>
-              </div>
+          {/* 3. Capture or Upload Document Box */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              3. Capture or Attach File *
+            </label>
 
-              <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-3.5 py-2 text-xs font-semibold text-teal-700 bg-white hover:bg-teal-50 border border-teal-300 rounded-lg flex items-center justify-center gap-1.5 shadow-xs transition-colors"
-                >
-                  <UploadCloud className="w-4 h-4 text-teal-600" />
-                  <span>Upload Image / PDF</span>
-                </button>
+            {!rawFile ? (
+              <div className="p-5 border-2 border-dashed border-slate-200 hover:border-teal-400 rounded-2xl bg-slate-50/70 transition-colors text-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto shadow-2xs">
+                  <UploadCloud className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-800">
+                    Capture document photo or upload digital report
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Supports PDF, JPEG, PNG, WebP (Max 10MB)
+                  </p>
+                </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    try {
-                      if (!cameraInputRef.current) {
-                        setCameraNotice('Camera access was not allowed. You can upload a photo or PDF instead.');
-                        return;
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1">
+                  {/* Primary Camera Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (cameraInputRef.current) {
+                        cameraInputRef.current.click();
                       }
-                      cameraInputRef.current.click();
-                    } catch {
-                      setCameraNotice('Camera access was not allowed. You can upload a photo or PDF instead.');
-                    }
-                  }}
-                  className="px-3.5 py-2 text-xs font-semibold text-teal-700 bg-white hover:bg-teal-50 border border-teal-300 rounded-lg flex items-center justify-center gap-1.5 shadow-xs transition-colors"
-                >
-                  <Camera className="w-4 h-4 text-teal-600" />
-                  <span>Scan with Camera</span>
-                </button>
-              </div>
-            </div>
+                    }}
+                    className="w-full sm:w-auto px-4 py-2 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+                  >
+                    <Camera className="w-4 h-4" />
+                    <span>Scan with Camera</span>
+                  </button>
 
-            {/* Hidden File and Camera Inputs */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.png,.jpg,.jpeg,.webp"
-              onChange={handleFileChange}
-              className="hidden"
-            />
+                  {/* Primary File Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (fileInputRef.current) {
+                        fileInputRef.current.click();
+                      }
+                    }}
+                    className="w-full sm:w-auto px-4 py-2 text-xs font-semibold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-300 rounded-xl flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer"
+                  >
+                    <UploadCloud className="w-4 h-4 text-teal-600" />
+                    <span>Upload Image / PDF</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Selected / Captured File Preview Card */
+              <div className="p-4 rounded-2xl border border-teal-200 bg-teal-50/30 space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {isImage && previewUrl ? (
+                      <img
+                        src={previewUrl}
+                        alt="Captured Document"
+                        className="w-16 h-16 object-cover rounded-xl border border-slate-300 shadow-xs shrink-0"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-red-50 text-red-600 rounded-xl border border-red-200 flex flex-col items-center justify-center shrink-0">
+                        <FileText className="w-6 h-6" />
+                        <span className="text-[9px] font-bold uppercase mt-0.5">PDF</span>
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 truncate">
+                          {fileName}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                          Ready
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Size: <strong className="text-slate-700">{formatSize(fileSize)}</strong>
+                      </p>
+                      <p className="text-[10px] text-teal-700 font-medium mt-0.5 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3 text-teal-600" />
+                        <span>Ready for secure patient record storage</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Clear Button */}
+                  <button
+                    type="button"
+                    onClick={handleClearFile}
+                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                    title="Remove file"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Retake / Change Actions */}
+                <div className="pt-2 border-t border-teal-200/60 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500">Need to change or retake photo?</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => cameraInputRef.current?.click()}
+                      className="px-2.5 py-1 text-xs font-medium text-teal-700 hover:bg-teal-100/60 rounded-lg border border-teal-300 flex items-center gap-1 cursor-pointer"
+                    >
+                      <RefreshCw className="w-3 h-3 text-teal-600" />
+                      <span>Retake</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200 flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>Choose File</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Hidden Input Elements */}
             <input
               ref={cameraInputRef}
               type="file"
               accept="image/*"
               capture="environment"
-              onChange={handleFileChange}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleFileSelection(f);
+                e.target.value = '';
+              }}
               className="hidden"
             />
-
-            {/* Live Preview Container */}
-            {currentDoc.fileData && (
-              <div className="mt-3 pt-3 border-t border-slate-200 flex items-center gap-3">
-                {currentDoc.previewUrl ? (
-                  <img
-                    src={currentDoc.previewUrl}
-                    alt="Document Preview"
-                    className="w-16 h-16 object-cover rounded-lg border border-slate-300 shadow-xs"
-                  />
-                ) : (
-                  <div className="w-16 h-16 bg-red-50 text-red-600 rounded-lg border border-red-200 flex flex-col items-center justify-center">
-                    <FileText className="w-6 h-6" />
-                    <span className="text-[9px] font-bold mt-0.5 uppercase">PDF</span>
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-slate-800 truncate">{currentDoc.fileName}</p>
-                  <p className="text-[10px] text-slate-500">
-                    {(currentDoc.fileSize / 1024).toFixed(1)} KB • Ready for encrypted upload
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => updateCurrentDoc('fileData', '')}
-                  className="text-xs text-red-600 hover:text-red-800 font-medium px-2 py-1"
-                >
-                  Clear
-                </button>
-              </div>
-            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.png,.jpg,.jpeg,.webp,image/*,application/pdf"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleFileSelection(f);
+                e.target.value = '';
+              }}
+              className="hidden"
+            />
           </div>
 
-          {/* Doctor Clinical Notes / Findings */}
+          {/* 4. Clinical Findings / Doctor Remarks (Optional) */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Clinical Findings / Doctor Remarks (Optional)
+              4. Clinical Findings / Doctor Remarks (Optional)
             </label>
             <textarea
               rows={2}
+              value={doctorNotes}
+              onChange={(e) => setDoctorNotes(e.target.value)}
               placeholder="e.g. Findings show patchy infiltrates in right lung; review after 5 days of oral antibiotics..."
-              value={currentDoc.doctorNotes}
-              onChange={(e) => updateCurrentDoc('doctorNotes', e.target.value)}
-              className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
+        </div>
 
-          {/* Modal Actions */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={handleAddAnother}
-              className="text-xs font-semibold text-teal-700 hover:text-teal-900 flex items-center gap-1"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Attach Another Document</span>
-            </button>
+        {/* Modal Footer Actions */}
+        <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/70 rounded-xl transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={loading}
-                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading || isOffline}
-                className="px-5 py-2 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg flex items-center gap-1.5 shadow-sm transition-all"
-              >
-                {loading ? 'Uploading Securely...' : isOffline ? 'Offline — Connect to Upload' : `Upload ${documentsQueue.length} ${documentsQueue.length === 1 ? 'Record' : 'Records'}`}
-              </button>
-            </div>
-          </div>
-        </form>
+          <button
+            type="button"
+            onClick={handleUploadSubmit}
+            disabled={loading || isOffline || !rawFile}
+            className="px-5 py-2 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+          >
+            {loading ? (
+              <>
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <span>Uploading Record...</span>
+              </>
+            ) : isOffline ? (
+              'Offline — Connect to Upload'
+            ) : (
+              <>
+                <UploadCloud className="w-4 h-4" />
+                <span>Upload Document</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

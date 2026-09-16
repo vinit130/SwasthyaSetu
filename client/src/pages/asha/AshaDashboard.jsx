@@ -101,7 +101,7 @@ export default function AshaDashboard() {
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-4 bg-linear-to-br from-white via-white to-teal-50/40 border-slate-200/90 border-t-4 border-t-teal-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+          <Card className="p-4 bg-gradient-to-br from-white via-white to-teal-50/40 border-slate-200/90 border-t-4 border-t-teal-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between text-slate-500 mb-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('totalPatients')}</span>
               <div className="w-8 h-8 rounded-xl bg-teal-100/70 text-teal-800 flex items-center justify-center shadow-xs">
@@ -112,7 +112,7 @@ export default function AshaDashboard() {
             <p className="text-[11px] text-teal-700 font-medium mt-1">Enrolled in village registry</p>
           </Card>
 
-          <Card className="p-4 bg-linear-to-br from-white via-white to-purple-50/40 border-slate-200/90 border-t-4 border-t-purple-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+          <Card className="p-4 bg-gradient-to-br from-white via-white to-purple-50/40 border-slate-200/90 border-t-4 border-t-purple-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between text-slate-500 mb-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('pendingReferrals')}</span>
               <div className="w-8 h-8 rounded-xl bg-purple-100/70 text-purple-800 flex items-center justify-center shadow-xs">
@@ -123,7 +123,7 @@ export default function AshaDashboard() {
             <p className="text-[11px] text-purple-700 font-medium mt-1">Hospital visits to coordinate</p>
           </Card>
 
-          <Card className="p-4 bg-linear-to-br from-white via-white to-amber-50/40 border-slate-200/90 border-t-4 border-t-amber-500 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+          <Card className="p-4 bg-gradient-to-br from-white via-white to-amber-50/40 border-slate-200/90 border-t-4 border-t-amber-500 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between text-slate-500 mb-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('upcomingFollowups')}</span>
               <div className="w-8 h-8 rounded-xl bg-amber-100/70 text-amber-800 flex items-center justify-center shadow-xs">
@@ -134,7 +134,7 @@ export default function AshaDashboard() {
             <p className="text-[11px] text-amber-700 font-medium mt-1">Due for wellness check</p>
           </Card>
 
-          <Card className="p-4 bg-linear-to-br from-white via-white to-sky-50/40 border-slate-200/90 border-t-4 border-t-sky-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+          <Card className="p-4 bg-gradient-to-br from-white via-white to-sky-50/40 border-slate-200/90 border-t-4 border-t-sky-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
             <div className="flex items-center justify-between text-slate-500 mb-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('recentlyRegistered')}</span>
               <div className="w-8 h-8 rounded-xl bg-sky-100/70 text-sky-800 flex items-center justify-center shadow-xs">

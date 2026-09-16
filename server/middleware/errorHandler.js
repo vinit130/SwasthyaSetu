@@ -18,6 +18,22 @@ const errorHandler = (err, req, res, next) => {
     return res.status(400).json({ success: false, message, duplicateField: field });
   }
 
+  // File Size or Request Entity Too Large Error
+  if (err.code === 'LIMIT_FILE_SIZE' || err.type === 'entity.too.large' || err.status === 413) {
+    return res.status(400).json({
+      success: false,
+      message: 'File is too large. Maximum allowed size is 10 MB.',
+    });
+  }
+
+  // Multer File Type Validation Error
+  if (err.message && err.message.includes('Only PDF, JPEG, PNG, and WebP')) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+
   // Mongoose Validation Error
   if (err.name === 'ValidationError') {
     const message = Object.values(err.errors)
