@@ -15,6 +15,8 @@ import {
   ShieldCheck,
   CheckCircle2,
   FileText,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { patientAPI, referralAPI, followupAPI } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
@@ -27,9 +29,39 @@ import Input from '../../components/common/Input';
 import Select from '../../components/common/Select';
 import PatientTimeline from '../../components/patient/PatientTimeline';
 import VitalsDisplay from '../../components/patient/VitalsDisplay';
-import DocumentList from '../../components/documents/DocumentList';
+import MedicalDocumentsCard from '../../components/documents/MedicalDocumentsCard';
 import DocumentUploadModal from '../../components/documents/DocumentUploadModal';
 import { formatDate } from '../../utils/formatters';
+
+const REFERRAL_HOSPITALS = [
+  'District Hospital, Aundh, Pune',
+  'Sub-Divisional Hospital, Shirur',
+  'Sassoon General Hospital & BJ Medical College, Pune',
+  'Other / Custom Facility',
+];
+
+const REFERRAL_SPECIALTIES = [
+  'General Medicine',
+  'Obstetrics & Gynecology',
+  'Pediatrics',
+  'Cardiology',
+  'Orthopedics',
+  'General Surgery',
+  'ENT',
+  'Ophthalmology',
+  'Pulmonary Medicine',
+];
+
+const COMMON_REFERRAL_REASONS = [
+  'Persistent High Fever',
+  'Suspected Acute Abdomen',
+  'Severe Anemia in Pregnancy',
+  'Uncontrolled Hypertension',
+  'Chest Pain / Suspected Cardiac Event',
+  'Respiratory Distress',
+  'Fracture / Trauma Stabilization',
+  'Post-Operative Complication',
+];
 
 export default function DoctorPatientProfile() {
   const { id } = useParams();
@@ -47,13 +79,30 @@ export default function DoctorPatientProfile() {
 
   // Referral form state
   const [referralForm, setReferralForm] = useState({
-    facility: 'District Hospital',
-    department: 'General Medicine',
+    facility: REFERRAL_HOSPITALS[0],
+    customFacilityName: '',
+    department: REFERRAL_SPECIALTIES[0],
     priority: 'ROUTINE',
     reason: '',
     instructions: '',
   });
   const [submittingReferral, setSubmittingReferral] = useState(false);
+  const [createdReferralToken, setCreatedReferralToken] = useState('');
+  const [referralCopied, setReferralCopied] = useState(false);
+
+  const closeReferralModal = () => {
+    setShowReferralModal(false);
+    setCreatedReferralToken('');
+    setReferralCopied(false);
+    setReferralForm({
+      facility: REFERRAL_HOSPITALS[0],
+      customFacilityName: '',
+      department: REFERRAL_SPECIALTIES[0],
+      priority: 'ROUTINE',
+      reason: '',
+      instructions: '',
+    });
+  };
 
   // Follow-up form state
   const [followupForm, setFollowupForm] = useState({
@@ -118,18 +167,24 @@ export default function DoctorPatientProfile() {
     e.preventDefault();
     try {
       setSubmittingReferral(true);
-      await referralAPI.createReferral({
+      const targetFacility = referralForm.facility === 'Other / Custom Facility'
+        ? (referralForm.customFacilityName?.trim() || 'Other Hospital')
+        : referralForm.facility;
+
+      const res = await referralAPI.createReferral({
         patientId: id,
-        ...referralForm,
+        facility: targetFacility,
+        department: referralForm.department,
+        priority: referralForm.priority,
+        reason: referralForm.reason,
+        instructions: referralForm.instructions,
       });
-      setShowReferralModal(false);
-      setReferralForm({
-        facility: 'District Hospital',
-        department: 'General Medicine',
-        priority: 'ROUTINE',
-        reason: '',
-        instructions: '',
-      });
+
+      if (res.data?.success && res.data?.data?.referralToken) {
+        setCreatedReferralToken(res.data.data.referralToken);
+      } else {
+        closeReferralModal();
+      }
       fetchProfile();
     } catch (err) {
       console.error('Failed to create referral:', err);
@@ -523,10 +578,9 @@ export default function DoctorPatientProfile() {
       )}
 
       {activeTab === 'documents' && (
-        <DocumentList
+        <MedicalDocumentsCard
           patientId={id}
           patientName={patient.name}
-          canUpload={true}
           onDocumentAdded={() => fetchProfile()}
         />
       )}
@@ -672,73 +726,207 @@ export default function DoctorPatientProfile() {
       {/* Modal: Create Referral */}
       <Modal
         isOpen={showReferralModal}
-        onClose={() => setShowReferralModal(false)}
-        title="Initiate Hospital Referral"
+        onClose={closeReferralModal}
+        title={createdReferralToken ? 'Hospital Referral Generated' : 'Initiate Hospital Referral'}
       >
-        <form onSubmit={handleCreateReferral} className="space-y-4">
-          <Input
-            label="Destination Facility / Hospital"
-            value={referralForm.facility}
-            onChange={(e) => setReferralForm({ ...referralForm, facility: e.target.value })}
-            placeholder="e.g. District Hospital / Sub-Divisional Hospital"
-            required
-          />
+        {createdReferralToken ? (
+          <div className="space-y-4 py-2">
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center space-y-2">
+              <div className="w-10 h-10 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto shadow-sm">
+                <Check className="w-5 h-5" />
+              </div>
+              <h4 className="text-sm font-bold text-emerald-950">Referral Successfully Registered</h4>
+              <p className="text-xs text-emerald-800">
+                Referral token generated and linked. Patient or ASHA can use this token for direct admission at the hospital.
+              </p>
+              
+              <div className="my-3 p-3 bg-white rounded-lg border border-emerald-300 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Referral Token</span>
+                  <span className="text-lg font-mono font-bold text-teal-800 tracking-wider">
+                    {createdReferralToken}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard?.writeText(createdReferralToken);
+                    setReferralCopied(true);
+                    setTimeout(() => setReferralCopied(false), 2500);
+                  }}
+                  className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                >
+                  {referralCopied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy Token</span>
+                    </>
+                  )}
+                </button>
+              </div>
 
-          <Input
-            label="Department / Clinical Specialty"
-            value={referralForm.department}
-            onChange={(e) => setReferralForm({ ...referralForm, department: e.target.value })}
-            placeholder="e.g. Cardiology, Pathology, General Surgery"
-            required
-          />
+              <div className="text-left text-xs bg-emerald-100/50 p-2.5 rounded-lg text-emerald-900 space-y-1">
+                <div><strong>Facility:</strong> {referralForm.facility === 'Other / Custom Facility' ? referralForm.customFacilityName : referralForm.facility}</div>
+                <div><strong>Specialty:</strong> {referralForm.department}</div>
+                <div><strong>Priority:</strong> {referralForm.priority}</div>
+              </div>
+            </div>
 
-          <Select
-            label="Priority Level"
-            value={referralForm.priority}
-            onChange={(e) => setReferralForm({ ...referralForm, priority: e.target.value })}
-            options={[
-              { value: 'ROUTINE', label: 'Routine (Elective / Outpatient)' },
-              { value: 'URGENT', label: 'Urgent (Within 24-48 Hours)' },
-              { value: 'EMERGENCY', label: 'Emergency (Immediate Transfer)' },
-            ]}
-          />
-
-          <div>
-            <label className="text-xs font-medium text-slate-700 block mb-1">
-              Referral Reason / Working Diagnosis *
-            </label>
-            <textarea
-              rows="3"
-              value={referralForm.reason}
-              onChange={(e) => setReferralForm({ ...referralForm, reason: e.target.value })}
-              placeholder="Clinical indication for tertiary hospital transfer..."
-              className="w-full p-2.5 text-xs rounded-lg border border-slate-300"
-              required
-            ></textarea>
+            <div className="flex justify-end pt-2">
+              <Button size="sm" onClick={closeReferralModal}>
+                Done
+              </Button>
+            </div>
           </div>
+        ) : (
+          <form onSubmit={handleCreateReferral} className="space-y-4">
+            {/* Target Facility Selection */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Destination Facility / Hospital *
+              </label>
+              <select
+                value={referralForm.facility}
+                onChange={(e) => setReferralForm({ ...referralForm, facility: e.target.value })}
+                className="w-full p-2 text-xs rounded-lg border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-teal-500"
+                required
+              >
+                {REFERRAL_HOSPITALS.map((h) => (
+                  <option key={h} value={h}>{h}</option>
+                ))}
+              </select>
 
-          <div>
-            <label className="text-xs font-medium text-slate-700 block mb-1">
-              Transport & Clinical Instructions
-            </label>
-            <textarea
-              rows="2"
-              value={referralForm.instructions}
-              onChange={(e) => setReferralForm({ ...referralForm, instructions: e.target.value })}
-              placeholder="e.g. Fasting state for blood work, accompanied by ASHA..."
-              className="w-full p-2.5 text-xs rounded-lg border border-slate-300"
-            ></textarea>
-          </div>
+              {referralForm.facility === 'Other / Custom Facility' && (
+                <input
+                  type="text"
+                  placeholder="Enter custom hospital / facility name..."
+                  value={referralForm.customFacilityName}
+                  onChange={(e) => setReferralForm({ ...referralForm, customFacilityName: e.target.value })}
+                  className="mt-2 w-full p-2 text-xs rounded-lg border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-teal-500"
+                  required
+                />
+              )}
+            </div>
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="secondary" size="sm" onClick={() => setShowReferralModal(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" size="sm" loading={submittingReferral}>
-              Submit Referral
-            </Button>
-          </div>
-        </form>
+            {/* Department / Clinical Specialty */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Department / Clinical Specialty *
+              </label>
+              <select
+                value={referralForm.department}
+                onChange={(e) => setReferralForm({ ...referralForm, department: e.target.value })}
+                className="w-full p-2 text-xs rounded-lg border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-teal-500"
+                required
+              >
+                {REFERRAL_SPECIALTIES.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Priority Selection with Color Badges */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1.5">
+                Priority Level *
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setReferralForm({ ...referralForm, priority: 'ROUTINE' })}
+                  className={`p-2 rounded-lg border text-xs font-semibold transition-all text-center ${
+                    referralForm.priority === 'ROUTINE'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-300'
+                      : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                  }`}
+                >
+                  Routine (Green)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReferralForm({ ...referralForm, priority: 'URGENT' })}
+                  className={`p-2 rounded-lg border text-xs font-semibold transition-all text-center ${
+                    referralForm.priority === 'URGENT'
+                      ? 'bg-amber-500 text-white border-amber-500 shadow-xs ring-2 ring-amber-300'
+                      : 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
+                  }`}
+                >
+                  Urgent (Amber)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReferralForm({ ...referralForm, priority: 'EMERGENCY' })}
+                  className={`p-2 rounded-lg border text-xs font-semibold transition-all text-center ${
+                    referralForm.priority === 'EMERGENCY'
+                      ? 'bg-red-600 text-white border-red-600 shadow-xs ring-2 ring-red-300'
+                      : 'bg-red-50 text-red-900 border-red-200 hover:bg-red-100'
+                  }`}
+                >
+                  Emergency (Red)
+                </button>
+              </div>
+            </div>
+
+            {/* Common Referral Reason Chips */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Common Referral Reasons (Click to auto-populate)
+              </label>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {COMMON_REFERRAL_REASONS.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setReferralForm({ ...referralForm, reason: r })}
+                    className={`px-2 py-1 text-[11px] rounded-lg border transition-all ${
+                      referralForm.reason === r
+                        ? 'bg-teal-600 text-white border-teal-600 font-semibold'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-teal-50 hover:border-teal-300'
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+              <textarea
+                rows="2"
+                value={referralForm.reason}
+                onChange={(e) => setReferralForm({ ...referralForm, reason: e.target.value })}
+                placeholder="Clinical indication for tertiary hospital transfer..."
+                className="w-full p-2.5 text-xs rounded-lg border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-teal-500"
+                required
+              />
+            </div>
+
+            {/* Transport & Instructions */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Transport & Clinical Instructions (Optional)
+              </label>
+              <textarea
+                rows="2"
+                value={referralForm.instructions}
+                onChange={(e) => setReferralForm({ ...referralForm, instructions: e.target.value })}
+                placeholder="e.g. Fasting state for blood work, accompanied by ASHA..."
+                className="w-full p-2.5 text-xs rounded-lg border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-teal-500"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="secondary" size="sm" onClick={closeReferralModal}>
+                Cancel
+              </Button>
+              <Button type="submit" size="sm" loading={submittingReferral}>
+                Submit Referral
+              </Button>
+            </div>
+          </form>
+        )}
       </Modal>
 
       {/* Modal: Schedule Follow-up */}

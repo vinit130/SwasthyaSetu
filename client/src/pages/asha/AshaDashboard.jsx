@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   Clock,
   ChevronRight,
+  UploadCloud,
+  FileText,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -145,53 +147,107 @@ export default function AshaDashboard() {
         </div>
       )}
 
-      {/* Main Quick Actions Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Main Quick Actions Bar (6 Essential Tools) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <Link to="/asha/register">
-          <button className="w-full p-3.5 rounded-xl border border-teal-200 bg-teal-50/60 hover:bg-teal-100/60 transition-colors text-left flex items-center justify-between group">
+          <button className="w-full p-3.5 rounded-xl border border-teal-200 bg-teal-50/60 hover:bg-teal-100/60 transition-all text-left flex flex-col justify-between h-full group shadow-xs">
+            <div className="flex items-center justify-between w-full mb-2">
+              <div className="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center shadow-xs">
+                <UserPlus className="w-4 h-4" />
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-teal-600 group-hover:translate-x-0.5 transition-transform" />
+            </div>
             <div>
-              <span className="font-semibold text-teal-900 text-xs sm:text-sm block">
+              <span className="font-bold text-teal-950 text-xs block">
                 {t('registerPatient')}
               </span>
-              <span className="text-[11px] text-teal-700">New household intake</span>
+              <span className="text-[10px] text-teal-700">New household intake</span>
             </div>
-            <UserPlus className="w-4 h-4 text-teal-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+          </button>
+        </Link>
+
+        <Link to="/asha/vitals">
+          <button className="w-full p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/60 transition-all text-left flex flex-col justify-between h-full group shadow-xs">
+            <div className="flex items-center justify-between w-full mb-2">
+              <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+                <Activity className="w-4 h-4" />
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <div>
+              <span className="font-bold text-emerald-950 text-xs block">
+                {t('addSymptomsVitals') || 'Add Symptoms & Vitals'}
+              </span>
+              <span className="text-[10px] text-emerald-700">Record frontline checkup</span>
+            </div>
           </button>
         </Link>
 
         <Link to="/asha/patients">
-          <button className="w-full p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors text-left flex items-center justify-between group">
+          <button className="w-full p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all text-left flex flex-col justify-between h-full group shadow-xs">
+            <div className="flex items-center justify-between w-full mb-2">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center shadow-xs">
+                <Users className="w-4 h-4" />
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+            </div>
             <div>
-              <span className="font-semibold text-slate-800 text-xs sm:text-sm block">
+              <span className="font-bold text-slate-800 text-xs block">
                 {t('patients')}
               </span>
-              <span className="text-[11px] text-slate-500">Search full registry</span>
+              <span className="text-[10px] text-slate-500">Search full registry</span>
             </div>
-            <Users className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
           </button>
         </Link>
 
         <Link to="/asha/referrals">
-          <button className="w-full p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors text-left flex items-center justify-between group">
+          <button className="w-full p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all text-left flex flex-col justify-between h-full group shadow-xs">
+            <div className="flex items-center justify-between w-full mb-2">
+              <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center shadow-xs">
+                <Share2 className="w-4 h-4" />
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+            </div>
             <div>
-              <span className="font-semibold text-slate-800 text-xs sm:text-sm block">
+              <span className="font-bold text-slate-800 text-xs block">
                 {t('referrals')}
               </span>
-              <span className="text-[11px] text-slate-500">Track hospital transfer</span>
+              <span className="text-[10px] text-slate-500">Track hospital transfer</span>
             </div>
-            <Share2 className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
           </button>
         </Link>
 
         <Link to="/asha/followups">
-          <button className="w-full p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors text-left flex items-center justify-between group">
+          <button className="w-full p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all text-left flex flex-col justify-between h-full group shadow-xs">
+            <div className="flex items-center justify-between w-full mb-2">
+              <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shadow-xs">
+                <CalendarCheck className="w-4 h-4" />
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+            </div>
             <div>
-              <span className="font-semibold text-slate-800 text-xs sm:text-sm block">
+              <span className="font-bold text-slate-800 text-xs block">
                 {t('followups')}
               </span>
-              <span className="text-[11px] text-slate-500">Home visit schedule</span>
+              <span className="text-[10px] text-slate-500">Home visit schedule</span>
             </div>
-            <CalendarCheck className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+          </button>
+        </Link>
+
+        <Link to="/asha/patients?action=upload">
+          <button className="w-full p-3.5 rounded-xl border border-teal-200 bg-white hover:bg-teal-50/50 transition-all text-left flex flex-col justify-between h-full group shadow-xs">
+            <div className="flex items-center justify-between w-full mb-2">
+              <div className="w-8 h-8 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center shadow-xs">
+                <UploadCloud className="w-4 h-4" />
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-teal-600 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <div>
+              <span className="font-bold text-slate-800 text-xs block">
+                Upload Document
+              </span>
+              <span className="text-[10px] text-slate-500">Scan Rx & lab reports</span>
+            </div>
           </button>
         </Link>
       </div>

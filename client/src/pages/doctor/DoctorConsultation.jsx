@@ -21,7 +21,7 @@ import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Badge from '../../components/common/Badge';
 import VitalsDisplay from '../../components/patient/VitalsDisplay';
-import DocumentList from '../../components/documents/DocumentList';
+import MedicalDocumentsCard from '../../components/documents/MedicalDocumentsCard';
 import DocumentUploadModal from '../../components/documents/DocumentUploadModal';
 
 const COMMON_OBSERVATIONS = [
@@ -427,10 +427,9 @@ export default function DoctorConsultation() {
         </Card>
 
         {/* Embedded Patient Medical Records Section */}
-        <DocumentList
+        <MedicalDocumentsCard
           patientId={patientId}
           patientName={patient?.name}
-          canUpload={true}
           onDocumentAdded={() => setConsultationDocsCount((prev) => prev + 1)}
         />
 

@@ -1,5 +1,17 @@
-import React, { useState, useRef } from 'react';
-import { X, UploadCloud, Camera, FileText, AlertCircle, CheckCircle, Plus, Trash2, Image, FileCheck } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  X,
+  UploadCloud,
+  Camera,
+  FileText,
+  AlertCircle,
+  CheckCircle,
+  Plus,
+  Trash2,
+  Image,
+  FileCheck,
+  WifiOff,
+} from 'lucide-react';
 import { documentAPI } from '../../services/api';
 
 const ALLOWED_MIME_TYPES = [
@@ -16,18 +28,36 @@ export const DOCUMENT_CATEGORIES = [
   { value: 'IMAGING_REPORT', label: 'Imaging Report' },
   { value: 'CT_SCAN', label: 'CT Scan' },
   { value: 'X_RAY', label: 'X-Ray' },
-  { value: 'ULTRASOUND', label: 'Ultrasound (USG)' },
+  { value: 'ULTRASOUND', label: 'Ultrasound' },
   { value: 'DISCHARGE_SUMMARY', label: 'Discharge Summary' },
   { value: 'REFERRAL_SLIP', label: 'Referral Document' },
-  { value: 'OTHER', label: 'Other Clinical Record' },
+  { value: 'OTHER', label: 'Other' },
 ];
 
-export default function DocumentUploadModal({ isOpen, onClose, patientId, patientName, onUploaded }) {
+export default function DocumentUploadModal({
+  isOpen,
+  onClose,
+  patientId,
+  patientName,
+  initialCamera = false,
+  onUploaded,
+}) {
+  const getAutoTitle = (catVal) => {
+    const cat = DOCUMENT_CATEGORIES.find((c) => c.value === catVal);
+    const label = cat ? cat.label : 'Prescription';
+    const date = new Date().toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+    return `${label} — ${date}`;
+  };
+
   // We maintain a list of documents to upload in a queue
   const [documentsQueue, setDocumentsQueue] = useState([
     {
       id: Date.now(),
-      title: '',
+      title: getAutoTitle('PRESCRIPTION'),
       documentType: 'PRESCRIPTION',
       fileData: '',
       fileName: '',
@@ -41,10 +71,35 @@ export default function DocumentUploadModal({ isOpen, onClose, patientId, patien
   const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [successCount, setSuccessCount] = useState(0);
+  const [successMsg, setSuccessMsg] = useState('');
+  const [cameraNotice, setCameraNotice] = useState('');
+  const [isOffline, setIsOffline] = useState(typeof navigator !== 'undefined' ? !navigator.onLine : false);
 
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen && initialCamera && cameraInputRef.current) {
+      setTimeout(() => {
+        try {
+          cameraInputRef.current?.click();
+        } catch {
+          setCameraNotice('Camera access was not allowed. You can upload a photo or PDF instead.');
+        }
+      }, 150);
+    }
+  }, [isOpen, initialCamera]);
 
   if (!isOpen) return null;
 
@@ -52,6 +107,21 @@ export default function DocumentUploadModal({ isOpen, onClose, patientId, patien
 
   const updateCurrentDoc = (field, value) => {
     setDocumentsQueue(prev => prev.map((doc, idx) => idx === activeIndex ? { ...doc, [field]: value } : doc));
+  };
+
+  const handleCategorySelect = (catVal) => {
+    const autoTitle = getAutoTitle(catVal);
+    setDocumentsQueue(prev => prev.map((doc, idx) => {
+      if (idx === activeIndex) {
+        const shouldUpdate = !doc.title || DOCUMENT_CATEGORIES.some(c => doc.title.startsWith(c.label));
+        return {
+          ...doc,
+          documentType: catVal,
+          title: shouldUpdate ? autoTitle : doc.title,
+        };
+      }
+      return doc;
+    }));
   };
 
   const processFile = (file) => {
@@ -144,6 +214,11 @@ export default function DocumentUploadModal({ isOpen, onClose, patientId, patien
   const handleSubmitAll = async (e) => {
     e.preventDefault();
 
+    if (isOffline) {
+      setError('Document upload requires an internet connection. Your other offline data can continue to be saved.');
+      return;
+    }
+
     // Validate that all documents have title and fileData
     for (let i = 0; i < documentsQueue.length; i++) {
       const doc = documentsQueue[i];
@@ -180,10 +255,13 @@ export default function DocumentUploadModal({ isOpen, onClose, patientId, patien
         }
       }
 
+      setSuccessMsg('Document uploaded successfully.');
       if (onUploaded) {
         uploadedDocs.forEach(d => onUploaded(d));
       }
-      onClose();
+      setTimeout(() => {
+        onClose();
+      }, 700);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to complete document upload. Please try again.');
     } finally {
@@ -215,6 +293,31 @@ export default function DocumentUploadModal({ isOpen, onClose, patientId, patien
           </button>
         </div>
 
+        {/* Offline Warning Banner */}
+        {isOffline && (
+          <div className="bg-amber-50 border-b border-amber-200 px-5 py-2.5 flex items-center gap-2 text-amber-800 text-xs font-medium">
+            <WifiOff className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>Document upload requires an internet connection. Your other offline data can continue to be saved.</span>
+          </div>
+        )}
+
+        {/* Camera Notice Banner */}
+        {cameraNotice && (
+          <div className="bg-blue-50 border-b border-blue-200 px-5 py-2.5 flex items-center justify-between text-blue-800 text-xs font-medium">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-blue-600 shrink-0" />
+              <span>{cameraNotice}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCameraNotice('')}
+              className="text-blue-600 hover:text-blue-900 ml-2 font-bold"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Multi-Document Queue Tabs */}
         <div className="bg-slate-50 px-5 py-2.5 border-b border-slate-200 flex items-center gap-2 overflow-x-auto">
           {documentsQueue.map((doc, idx) => (
@@ -227,8 +330,8 @@ export default function DocumentUploadModal({ isOpen, onClose, patientId, patien
                   : 'bg-white text-slate-700 border-slate-200 hover:border-teal-300'
               }`}
             >
-              <span>#{idx + 1} {doc.title ? (doc.title.length > 14 ? doc.title.slice(0, 14) + '...' : doc.title) : 'New Document'}</span>
-              {doc.fileData && <span className="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>}
+              <span>#{idx + 1} {doc.title ? (doc.title.length > 16 ? doc.title.slice(0, 16) + '...' : doc.title) : 'New Document'}</span>
+              {doc.fileData && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>}
               {documentsQueue.length > 1 && (
                 <button
                   type="button"
@@ -260,6 +363,39 @@ export default function DocumentUploadModal({ isOpen, onClose, patientId, patien
             </div>
           )}
 
+          {successMsg && (
+            <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl flex items-center gap-2 border border-emerald-200">
+              <CheckCircle className="w-4 h-4 shrink-0 text-emerald-600" />
+              <span>{successMsg}</span>
+            </div>
+          )}
+
+          {/* Category Chips Selection */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              Select Document Category (Click to choose & auto-fill title)
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {DOCUMENT_CATEGORIES.map((cat) => {
+                const isSelected = currentDoc.documentType === cat.value;
+                return (
+                  <button
+                    key={cat.value}
+                    type="button"
+                    onClick={() => handleCategorySelect(cat.value)}
+                    className={`px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all border ${
+                      isSelected
+                        ? 'bg-teal-600 text-white border-teal-600 shadow-xs font-semibold'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-teal-50 hover:border-teal-300'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Title */}
             <div>
@@ -268,7 +404,7 @@ export default function DocumentUploadModal({ isOpen, onClose, patientId, patien
               </label>
               <input
                 type="text"
-                placeholder="e.g. Chest CT Scan, CBC Blood Report, Discharge Summary"
+                placeholder={currentDoc.documentType === 'OTHER' ? 'Enter document title...' : 'e.g. Blood Test — 16 Sep 2026'}
                 value={currentDoc.title}
                 onChange={(e) => updateCurrentDoc('title', e.target.value)}
                 className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -276,14 +412,14 @@ export default function DocumentUploadModal({ isOpen, onClose, patientId, patien
               />
             </div>
 
-            {/* Document Category Dropdown */}
+            {/* Document Category Dropdown (secondary selector) */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Clinical Category *
+                Clinical Category Dropdown
               </label>
               <select
                 value={currentDoc.documentType}
-                onChange={(e) => updateCurrentDoc('documentType', e.target.value)}
+                onChange={(e) => handleCategorySelect(e.target.value)}
                 className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 bg-white text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
               >
                 {DOCUMENT_CATEGORIES.map(cat => (
@@ -294,34 +430,44 @@ export default function DocumentUploadModal({ isOpen, onClose, patientId, patien
           </div>
 
           {/* Upload / Camera Action Box */}
-          <div className="p-4 border-2 border-dashed border-slate-200 hover:border-teal-400 rounded-xl bg-slate-50/50 transition-colors">
+          <div className="p-4 border-2 border-dashed border-slate-200 hover:border-teal-400 rounded-xl bg-slate-50/60 transition-colors">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold text-slate-800">
-                  {currentDoc.fileName ? `Selected: ${currentDoc.fileName}` : 'Attach Document or Camera Scan'}
+                  {currentDoc.fileName ? `Selected: ${currentDoc.fileName}` : 'Attach Document or Scan'}
                 </p>
                 <p className="text-[11px] text-slate-500">
-                  Accepts PDF, JPEG, PNG, WebP (Max 10MB)
+                  Accepts PDF, JPEG, PNG, WebP (Max 10MB per file)
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-2 text-xs font-semibold text-teal-700 bg-white hover:bg-teal-50 border border-teal-300 rounded-lg flex items-center gap-1.5 shadow-xs transition-colors"
+                  className="px-3.5 py-2 text-xs font-semibold text-teal-700 bg-white hover:bg-teal-50 border border-teal-300 rounded-lg flex items-center justify-center gap-1.5 shadow-xs transition-colors"
                 >
                   <UploadCloud className="w-4 h-4 text-teal-600" />
-                  <span>Upload File / PDF</span>
+                  <span>Upload Image / PDF</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => cameraInputRef.current?.click()}
-                  className="px-3 py-2 text-xs font-semibold text-teal-700 bg-white hover:bg-teal-50 border border-teal-300 rounded-lg flex items-center gap-1.5 shadow-xs transition-colors"
+                  onClick={() => {
+                    try {
+                      if (!cameraInputRef.current) {
+                        setCameraNotice('Camera access was not allowed. You can upload a photo or PDF instead.');
+                        return;
+                      }
+                      cameraInputRef.current.click();
+                    } catch {
+                      setCameraNotice('Camera access was not allowed. You can upload a photo or PDF instead.');
+                    }
+                  }}
+                  className="px-3.5 py-2 text-xs font-semibold text-teal-700 bg-white hover:bg-teal-50 border border-teal-300 rounded-lg flex items-center justify-center gap-1.5 shadow-xs transition-colors"
                 >
                   <Camera className="w-4 h-4 text-teal-600" />
-                  <span>Scan / Camera</span>
+                  <span>Scan with Camera</span>
                 </button>
               </div>
             </div>
@@ -411,10 +557,10 @@ export default function DocumentUploadModal({ isOpen, onClose, patientId, patien
               </button>
               <button
                 type="submit"
-                disabled={loading}
-                className="px-5 py-2 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50 rounded-lg flex items-center gap-1.5 shadow-sm transition-all"
+                disabled={loading || isOffline}
+                className="px-5 py-2 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg flex items-center gap-1.5 shadow-sm transition-all"
               >
-                {loading ? 'Uploading Securely...' : `Upload ${documentsQueue.length} ${documentsQueue.length === 1 ? 'Record' : 'Records'}`}
+                {loading ? 'Uploading Securely...' : isOffline ? 'Offline — Connect to Upload' : `Upload ${documentsQueue.length} ${documentsQueue.length === 1 ? 'Record' : 'Records'}`}
               </button>
             </div>
           </div>

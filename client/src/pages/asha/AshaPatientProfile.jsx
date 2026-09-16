@@ -22,6 +22,7 @@ import Badge from '../../components/common/Badge';
 import SkeletonLoader from '../../components/common/SkeletonLoader';
 import PatientTimeline from '../../components/patient/PatientTimeline';
 import VitalsDisplay from '../../components/patient/VitalsDisplay';
+import MedicalDocumentsCard from '../../components/documents/MedicalDocumentsCard';
 import { formatDate } from '../../utils/formatters';
 
 export default function AshaPatientProfile() {
@@ -114,6 +115,16 @@ export default function AshaPatientProfile() {
 
           {/* Header Actions */}
           <div className="flex flex-wrap items-center gap-2">
+            <Button
+              size="md"
+              variant="outline"
+              onClick={() => setActiveTab('documents')}
+              className="border-teal-300 text-teal-700 hover:bg-teal-50"
+            >
+              <FileText className="w-4 h-4 mr-1.5 text-teal-600" />
+              <span>Medical Documents</span>
+            </Button>
+
             <Link to={`/asha/patients/${patient._id}/symptoms`}>
               <Button size="md" className="shadow-xs">
                 <Activity className="w-4 h-4 mr-1.5" />
@@ -166,6 +177,16 @@ export default function AshaPatientProfile() {
             }`}
           >
             Hospital Referrals ({referrals.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('documents')}
+            className={`pb-3 border-b-2 transition-colors whitespace-nowrap ${
+              activeTab === 'documents'
+                ? 'border-teal-600 text-teal-700 font-semibold'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Medical Documents
           </button>
           <button
             onClick={() => setActiveTab('info')}
@@ -391,6 +412,14 @@ export default function AshaPatientProfile() {
             </div>
           </div>
         </Card>
+      )}
+
+      {activeTab === 'documents' && (
+        <MedicalDocumentsCard
+          patientId={id}
+          patientName={patient.name}
+          onDocumentAdded={fetchProfile}
+        />
       )}
     </div>
   );

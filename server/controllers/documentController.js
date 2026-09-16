@@ -15,6 +15,14 @@ exports.getPatientDocuments = async (req, res, next) => {
   try {
     const { patientId } = req.params;
 
+    // Least privilege: Health Department has aggregate surveillance access, not individual document access
+    if (req.user.role === 'HEALTH_DEPARTMENT_ADMIN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied: Health Department administrators have surveillance-level access and cannot view individual patient medical documents under clinical privacy policies.',
+      });
+    }
+
     // Strict patient isolation enforcement: PATIENT role can only view their own documents
     if (req.user.role === 'PATIENT') {
       const userPatientId = req.user.patientId?.toString();
@@ -132,11 +140,12 @@ exports.uploadDocument = async (req, res, next) => {
     const saved = await doc.save();
 
     // Log audit
-    await logAudit({
-      userId: req.user._id || req.user.id,
-      patientId,
-      action: 'UPLOAD_MEDICAL_DOCUMENT',
-      role: req.user.role,
+    await logAudit(req, {
+      action: 'DOCUMENT_UPLOADED',
+      resourceType: 'MedicalDocument',
+      resourceId: docId,
+      facilityId: req.user.facilityId || null,
+      district: req.user.assignedDistrict || null,
       details: `Uploaded ${documentType}: '${title}' for patient ${patient.name} (${patient.patientId}) via ${storageProvider}`,
     });
 
@@ -174,6 +183,14 @@ exports.viewDocument = async (req, res, next) => {
       });
     }
 
+    // Least privilege: Health Department has aggregate surveillance access, not individual document access
+    if (req.user.role === 'HEALTH_DEPARTMENT_ADMIN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied: Health Department administrators have surveillance-level access and cannot view individual patient medical documents under clinical privacy policies.',
+      });
+    }
+
     // Strict patient isolation enforcement
     if (req.user.role === 'PATIENT') {
       const userPatientId = req.user.patientId?.toString();
@@ -186,11 +203,12 @@ exports.viewDocument = async (req, res, next) => {
     }
 
     // Log view audit
-    await logAudit({
-      userId: req.user._id || req.user.id,
-      patientId: doc.patientId,
-      action: 'VIEW_MEDICAL_DOCUMENT',
-      role: req.user.role,
+    await logAudit(req, {
+      action: 'DOCUMENT_VIEWED',
+      resourceType: 'MedicalDocument',
+      resourceId: doc._id,
+      facilityId: req.user.facilityId || null,
+      district: req.user.assignedDistrict || null,
       details: `Viewed ${doc.documentType} '${doc.title}' (Provider: ${doc.storageProvider})`,
     });
 

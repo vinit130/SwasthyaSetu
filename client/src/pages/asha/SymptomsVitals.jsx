@@ -28,13 +28,15 @@ import VoiceInputButton from '../../components/common/VoiceInputButton';
 const AVAILABLE_SYMPTOMS = [
   'Fever',
   'Cough',
-  'Cold',
+  'Cold / Runny nose',
   'Headache',
-  'Body pain',
+  'Body pain / Myalgia',
   'Breathing difficulty',
-  'Vomiting',
-  'Diarrhea',
-  'Chest discomfort',
+  'Vomiting / Nausea',
+  'Diarrhea / Loose stools',
+  'Chest discomfort / pain',
+  'Weakness / Fatigue',
+  'Dizziness',
   'Other',
 ];
 

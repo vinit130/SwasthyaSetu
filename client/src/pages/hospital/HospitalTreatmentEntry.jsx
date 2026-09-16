@@ -11,6 +11,35 @@ import {
   Hospital,
 } from 'lucide-react';
 import { hospitalAPI, patientAPI } from '../../services/api';
+import MedicalDocumentsCard from '../../components/documents/MedicalDocumentsCard';
+
+const COMMON_DIAGNOSES = [
+  'Acute Severe Bronchopneumonia',
+  'Acute Appendicitis',
+  'Severe Dehydration / Gastroenteritis',
+  'Hypertensive Urgency',
+  'Post-Partum Hemorrhage',
+  'Type-1 Respiratory Distress',
+  'Compound Fracture Stabilized',
+  'Septic Shock / Sepsis',
+];
+
+const COMMON_TREATMENTS = [
+  'IV Fluid resuscitation with RL & NS',
+  'IV Ceftriaxone 1g BD administered',
+  'Oxygen therapy via nasal cannula at 4L/min',
+  'Nebulization with Salbutamol + Budecort',
+  'Emergency surgical exploration performed',
+  'Continuous vitals & SpO2 monitoring',
+  'Wound debridement and sterile splinting',
+];
+
+const COMMON_DISCHARGE_INSTRUCTIONS = [
+  'Strict bed rest for 7 days with adequate oral fluid intake',
+  'Complete full 5-day antibiotic course without missing doses',
+  'ASHA worker home visit required on day 3 for BP and vitals check',
+  'Return immediately if fever recurs, shortness of breath, or surgical site pain',
+];
 
 export default function HospitalTreatmentEntry() {
   const navigate = useNavigate();
@@ -212,7 +241,26 @@ export default function HospitalTreatmentEntry() {
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Primary Clinical Diagnosis *</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block font-bold text-slate-700">Primary Clinical Diagnosis *</label>
+              <span className="text-[11px] text-slate-400">Click quick option to populate</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {COMMON_DIAGNOSES.map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => setDiagnosis(d)}
+                  className={`px-2 py-1 text-[11px] rounded-lg border transition-all ${
+                    diagnosis === d
+                      ? 'bg-purple-700 text-white border-purple-700 font-semibold'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-purple-50 hover:border-purple-300'
+                  }`}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
             <input
               type="text"
               placeholder="e.g. Acute Severe Bronchopneumonia with Type-1 Respiratory Failure"
@@ -224,7 +272,24 @@ export default function HospitalTreatmentEntry() {
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Hospital Treatment & Procedures Performed *</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block font-bold text-slate-700">Hospital Treatment & Procedures Performed *</label>
+              <span className="text-[11px] text-slate-400">Click to append procedure</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {COMMON_TREATMENTS.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => {
+                    setTreatmentSummary((prev) => prev ? `${prev.trim()}; ${t}` : t);
+                  }}
+                  className="px-2 py-1 text-[11px] rounded-lg bg-slate-50 text-slate-700 border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-colors"
+                >
+                  + {t}
+                </button>
+              ))}
+            </div>
             <textarea
               rows={3}
               placeholder="Detailed treatment summary (e.g. IV Fluid resuscitation, IV Ceftriaxone, continuous SpO2 monitoring, supplemental oxygen via nasal cannula)..."
@@ -298,9 +363,26 @@ export default function HospitalTreatmentEntry() {
 
         {/* Discharge / Followup Instructions */}
         <div className="text-xs">
-          <label className="block font-bold text-slate-700 mb-1">
-            Discharge Summary & Post-Hospital Care Instructions
-          </label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="block font-bold text-slate-700">
+              Discharge Summary & Post-Hospital Care Instructions
+            </label>
+            <span className="text-[11px] text-slate-400">Click to append directive</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {COMMON_DISCHARGE_INSTRUCTIONS.map((inst) => (
+              <button
+                key={inst}
+                type="button"
+                onClick={() => {
+                  setDischargeNotes((prev) => prev ? `${prev.trim()}\n• ${inst}` : `• ${inst}`);
+                }}
+                className="px-2 py-1 text-[11px] rounded-lg bg-slate-50 text-slate-700 border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-colors"
+              >
+                + {inst.slice(0, 35)}...
+              </button>
+            ))}
+          </div>
           <textarea
             rows={2}
             placeholder="Instructions for patient and ASHA frontline worker for village follow-up..."
@@ -309,6 +391,16 @@ export default function HospitalTreatmentEntry() {
             className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
+
+        {/* Hospital Document Upload Section */}
+        {patientId && (
+          <div className="pt-2">
+            <MedicalDocumentsCard
+              patientId={patientId}
+              patientName={patients.find((p) => (p._id || p.id) === patientId)?.name}
+            />
+          </div>
+        )}
 
         <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3">
           <button

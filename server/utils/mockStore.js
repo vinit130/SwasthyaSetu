@@ -2202,6 +2202,14 @@ class MockStore {
   getPatientDocuments(req, res) {
     const { patientId } = req.params;
 
+    // Least privilege: Health Department has aggregate surveillance access, not individual document access
+    if (req.user?.role === 'HEALTH_DEPARTMENT_ADMIN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied: Health Department administrators have surveillance-level access and cannot view individual patient medical documents under clinical privacy policies.',
+      });
+    }
+
     // Patient isolation
     if (req.user?.role === 'PATIENT' && req.user.patientId?.toString() !== patientId) {
       return res.status(403).json({
@@ -2228,6 +2236,14 @@ class MockStore {
 
     if (!doc) {
       return res.status(404).json({ success: false, message: 'Medical document not found' });
+    }
+
+    // Least privilege: Health Department has aggregate surveillance access, not individual document access
+    if (req.user?.role === 'HEALTH_DEPARTMENT_ADMIN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied: Health Department administrators have surveillance-level access and cannot view individual patient medical documents under clinical privacy policies.',
+      });
     }
 
     // Patient privacy isolation
