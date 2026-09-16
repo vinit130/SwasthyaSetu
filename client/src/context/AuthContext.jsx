@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
       setUser(receivedUser);
       localStorage.setItem('swasthyasetu_token', receivedToken);
       localStorage.setItem('swasthyasetu_user', JSON.stringify(receivedUser));
-      return receivedUser;
+      return { success: true, user: receivedUser, ...receivedUser };
     }
     throw new Error(response.data.message || 'Login failed');
   };

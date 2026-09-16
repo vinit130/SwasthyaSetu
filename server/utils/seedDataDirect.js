@@ -1,4 +1,4 @@
-﻿const bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Patient = require('../models/Patient');
 const Visit = require('../models/Visit');
@@ -8,34 +8,64 @@ const Followup = require('../models/Followup');
 
 module.exports = async function seedInitialData() {
   try {
-    const count = await User.countDocuments();
-    if (count > 0) return;
-
-    console.log('[AutoSeed] Seeding initial demo records...');
-
     const salt = await bcrypt.genSalt(10);
     const demoPasswordHash = await bcrypt.hash('Demo@123', salt);
 
-    // 1. Create Demo Users
-    const ashaWorker = await User.create({
+    // Helper to ensure all 5 demo accounts exist in MongoDB
+    const ensureDemoUser = async (data) => {
+      const exists = await User.findOne({
+        $or: [{ email: data.email }, { username: data.username }],
+      });
+      if (!exists) {
+        return await User.create({ ...data, passwordHash: demoPasswordHash });
+      }
+      return exists;
+    };
+
+    const ashaWorker = await ensureDemoUser({
       name: 'Sunita Devi (ASHA)',
       email: 'asha@demo.com',
       username: 'asha_demo',
-      passwordHash: demoPasswordHash,
       role: 'ASHA',
       phone: '9876543210',
       language: 'en',
     });
 
-    const doctor = await User.create({
+    const doctor = await ensureDemoUser({
       name: 'Dr. Ananya Sharma',
       email: 'doctor@demo.com',
       username: 'doctor_demo',
-      passwordHash: demoPasswordHash,
       role: 'DOCTOR',
       phone: '9876543211',
       language: 'en',
     });
+
+    const hospitalStaff = await ensureDemoUser({
+      name: 'Dr. Suresh Patil (Medical Superintendent)',
+      email: 'hospital@demo.com',
+      username: 'hospital_demo',
+      role: 'DISTRICT_HOSPITAL',
+      phone: '9876543213',
+      facilityId: 'fac_pune_dh',
+      facilityName: 'District Hospital, Aundh, Pune',
+      assignedDistrict: 'Pune',
+      language: 'en',
+    });
+
+    const healthAdmin = await ensureDemoUser({
+      name: 'Dr. Rajesh Shinde (Director of Health Services)',
+      email: 'admin@demo.com',
+      username: 'admin_demo',
+      role: 'HEALTH_DEPARTMENT_ADMIN',
+      phone: '9876543212',
+      assignedDistrict: 'All Maharashtra',
+      language: 'en',
+    });
+
+    const count = await Patient.countDocuments();
+    if (count > 0) return;
+
+    console.log('[AutoSeed] Seeding initial demo patient records...');
 
     // 2. Create Rahul Kumar
     const rahul = await Patient.create({

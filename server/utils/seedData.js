@@ -52,7 +52,31 @@ const seedDatabase = async () => {
       language: 'en',
     });
 
-    console.log('[Seed] Created demo users (ASHA & DOCTOR)');
+    const hospitalStaff = await User.create({
+      name: 'Dr. Suresh Patil (Medical Superintendent)',
+      email: 'hospital@demo.com',
+      username: 'hospital_demo',
+      passwordHash: demoPasswordHash,
+      role: 'DISTRICT_HOSPITAL',
+      phone: '9876543213',
+      facilityId: 'fac_pune_dh',
+      facilityName: 'District Hospital, Aundh, Pune',
+      assignedDistrict: 'Pune',
+      language: 'en',
+    });
+
+    const healthAdmin = await User.create({
+      name: 'Dr. Rajesh Shinde (Director of Health Services)',
+      email: 'admin@demo.com',
+      username: 'admin_demo',
+      passwordHash: demoPasswordHash,
+      role: 'HEALTH_DEPARTMENT_ADMIN',
+      phone: '9876543212',
+      assignedDistrict: 'All Maharashtra',
+      language: 'en',
+    });
+
+    console.log('[Seed] Created demo users (ASHA, DOCTOR, HOSPITAL, ADMIN)');
 
     // 2. Create Patient: Rahul Kumar (Yellow Risk, full journey)
     const rahul = await Patient.create({

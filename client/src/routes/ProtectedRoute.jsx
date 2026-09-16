@@ -29,6 +29,10 @@ export default function ProtectedRoute({ children, allowedRoles }) {
       return <Navigate to="/doctor/dashboard" replace />;
     } else if (user.role === 'PATIENT') {
       return <Navigate to="/patient/dashboard" replace />;
+    } else if (user.role === 'HEALTH_DEPARTMENT_ADMIN') {
+      return <Navigate to="/admin/dashboard" replace />;
+    } else if (user.role === 'DISTRICT_HOSPITAL') {
+      return <Navigate to="/hospital/dashboard" replace />;
     }
     return <Navigate to="/login" replace />;
   }

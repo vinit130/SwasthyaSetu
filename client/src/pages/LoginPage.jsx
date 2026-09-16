@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import {
   Lock,
   Mail,
@@ -24,6 +24,7 @@ import Logo from '../components/common/Logo';
 import LanguageSelector from '../components/common/LanguageSelector';
 
 export default function LoginPage() {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -31,53 +32,29 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
+  const { login, user, isAuthenticated } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
   const navigateByRole = (role) => {
     switch (role) {
       case 'ASHA':
-        navigate('/asha/dashboard');
+        navigate('/asha/dashboard', { replace: true });
         break;
       case 'DOCTOR':
-        navigate('/doctor/dashboard');
+        navigate('/doctor/dashboard', { replace: true });
         break;
       case 'PATIENT':
-        navigate('/patient/dashboard');
+        navigate('/patient/dashboard', { replace: true });
         break;
       case 'HEALTH_DEPARTMENT_ADMIN':
-        navigate('/admin/dashboard');
+        navigate('/admin/dashboard', { replace: true });
         break;
       case 'DISTRICT_HOSPITAL':
-        navigate('/hospital/dashboard');
+        navigate('/hospital/dashboard', { replace: true });
         break;
       default:
-        navigate('/');
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-
-    if (!email || !password) {
-      setError(t('errorRequired'));
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const res = await login(email.trim(), password);
-      if (res.success) {
-        navigateByRole(res.user.role);
-      } else {
-        setError(res.message || t('invalidCredentials'));
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || t('loginFailed'));
-    } finally {
-      setLoading(false);
+        navigate('/', { replace: true });
     }
   };
 
@@ -88,13 +65,66 @@ export default function LoginPage() {
     try {
       setLoading(true);
       const res = await login(demoEmail, 'Demo@123');
-      if (res.success) {
-        navigateByRole(res.user.role);
+      const role = res?.user?.role || res?.role;
+      if (role) {
+        navigateByRole(role);
+      } else if (res?.success) {
+        navigateByRole(res.user?.role || res.role);
       } else {
-        setError(res.message || t('invalidCredentials'));
+        setError(res?.message || t('invalidCredentials'));
       }
     } catch (err) {
-      setError(err.response?.data?.message || t('loginFailed'));
+      setError(err.response?.data?.message || err.message || t('invalidCredentials'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 1-Click auto-login if URL has ?demo= or ?role=
+  useEffect(() => {
+    const demoParam = (searchParams.get('demo') || searchParams.get('role') || '').toLowerCase().trim();
+    if (demoParam) {
+      const demoEmailMap = {
+        asha: 'asha@demo.com',
+        doctor: 'doctor@demo.com',
+        hospital: 'hospital@demo.com',
+        districthospital: 'hospital@demo.com',
+        admin: 'admin@demo.com',
+        healthadmin: 'admin@demo.com',
+        patient: 'patient@demo.com',
+      };
+      const targetEmail = demoEmailMap[demoParam];
+      if (targetEmail) {
+        handleDemoLogin(targetEmail);
+      }
+    } else if (isAuthenticated && user?.role) {
+      // If already authenticated and no explicit demo requested, go directly to authorized dashboard
+      navigateByRole(user.role);
+    }
+  }, [searchParams, isAuthenticated, user]);
+
+  const handleSubmit = async (e) => {
+    e?.preventDefault?.();
+    setError('');
+
+    if (!email || !password) {
+      setError(t('errorRequired'));
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await login(email.trim(), password);
+      const role = res?.user?.role || res?.role;
+      if (role) {
+        navigateByRole(role);
+      } else if (res?.success) {
+        navigateByRole(res.user?.role || res.role);
+      } else {
+        setError(res?.message || t('invalidCredentials'));
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || t('invalidCredentials'));
     } finally {
       setLoading(false);
     }

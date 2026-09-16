@@ -17,6 +17,7 @@ import {
   User,
   Pill,
   Sparkles,
+  Building,
 } from 'lucide-react';
 import Button from '../components/common/Button';
 import Logo from '../components/common/Logo';
@@ -102,6 +103,54 @@ export default function LandingPage() {
             </a>
           </div>
 
+          {/* Quick 1-Click Demo Dashboard Access */}
+          <div className="mt-7 pt-5 border-t border-slate-200/60 max-w-4xl mx-auto">
+            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2.5">
+              ⚡ Instant 1-Click Demo Access (Zero Typing Required):
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+              <Link
+                to="/login?demo=asha"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 border border-teal-200/90 hover:bg-teal-100/80 text-teal-800 text-xs font-semibold shadow-2xs transition-all hover:scale-102"
+              >
+                <Users className="w-3.5 h-3.5 text-teal-700" />
+                <span>ASHA / ANM</span>
+              </Link>
+
+              <Link
+                to="/login?demo=doctor"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200/90 hover:bg-indigo-100/80 text-indigo-800 text-xs font-semibold shadow-2xs transition-all hover:scale-102"
+              >
+                <Stethoscope className="w-3.5 h-3.5 text-indigo-700" />
+                <span>Doctor</span>
+              </Link>
+
+              <Link
+                to="/login?demo=hospital"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200/90 hover:bg-rose-100/80 text-rose-800 text-xs font-semibold shadow-2xs transition-all hover:scale-102"
+              >
+                <Building className="w-3.5 h-3.5 text-rose-700" />
+                <span>District Hospital</span>
+              </Link>
+
+              <Link
+                to="/login?demo=admin"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-200/90 hover:bg-blue-100/80 text-blue-800 text-xs font-semibold shadow-2xs transition-all hover:scale-102"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-700" />
+                <span>Health Admin</span>
+              </Link>
+
+              <Link
+                to="/login?demo=patient"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200/90 hover:bg-emerald-100/80 text-emerald-800 text-xs font-semibold shadow-2xs transition-all hover:scale-102"
+              >
+                <User className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Patient Portal</span>
+              </Link>
+            </div>
+          </div>
+
           {/* Responsible Decision Support Disclaimer */}
           <div className="mt-12 max-w-3xl mx-auto p-4 bg-white/95 backdrop-blur-xs border border-slate-200 shadow-xs rounded-2xl flex items-start gap-3 text-left">
             <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0 mt-0.5">
@@ -133,8 +182,8 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* 3 Role Cards */}
-          <div className="grid md:grid-cols-3 gap-6">
+          {/* 5 Role Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Role 1: ASHA */}
             <div className="bg-white rounded-2xl border-2 border-teal-100 p-6 shadow-xs hover:shadow-md hover:border-teal-300 transition-all flex flex-col justify-between group">
               <div>
@@ -158,9 +207,9 @@ export default function LandingPage() {
                   <li className="flex items-center gap-2">✓ Conduct scheduled home recovery visits</li>
                 </ul>
               </div>
-              <Link to="/login">
-                <Button variant="outline" size="sm" className="w-full">
-                  <span>{t('signInBtn')} as ASHA</span>
+              <Link to="/login?demo=asha">
+                <Button variant="outline" size="sm" className="w-full border-teal-600 text-teal-700 hover:bg-teal-50 font-semibold">
+                  <span>Launch ASHA Dashboard</span>
                   <ArrowRight className="w-3.5 h-3.5 ml-1" />
                 </Button>
               </Link>
@@ -191,16 +240,82 @@ export default function LandingPage() {
                   <li className="flex items-center gap-2">✓ Schedule follow-up check-ins for ASHA</li>
                 </ul>
               </div>
-              <Link to="/login">
-                <Button size="sm" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
-                  <span>{t('signInBtn')} as Doctor</span>
+              <Link to="/login?demo=doctor">
+                <Button size="sm" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
+                  <span>Launch Doctor Dashboard</span>
                   <ArrowRight className="w-3.5 h-3.5 ml-1" />
                 </Button>
               </Link>
             </div>
 
-            {/* Role 3: PATIENT */}
-            <div className="bg-white rounded-2xl border-2 border-emerald-100 p-6 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between group">
+            {/* Role 3: DISTRICT HOSPITAL */}
+            <div className="bg-white rounded-2xl border-2 border-rose-100 p-6 shadow-xs hover:shadow-md hover:border-rose-300 transition-all flex flex-col justify-between group">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                  <Building className="w-6 h-6" />
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200">
+                    Secondary & Inpatient Care
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">District Hospital</h3>
+                <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                  Secondary care operations with referral scanner, real-time bed tracking, and Break-Glass emergency access.
+                </p>
+                <ul className="space-y-2 text-xs text-slate-600 mb-6">
+                  <li className="flex items-center gap-2">✓ Instant referral token verification (ST-REF-XXXX)</li>
+                  <li className="flex items-center gap-2 font-semibold text-rose-900">
+                    ✓ Live ICU, Oxygen & General bed availability tracker
+                  </li>
+                  <li className="flex items-center gap-2">✓ Break-Glass emergency lookup with audit trails</li>
+                  <li className="flex items-center gap-2">✓ Inpatient treatment summaries & discharge updates</li>
+                  <li className="flex items-center gap-2">✓ Continuity handoff back to ASHA for home visits</li>
+                </ul>
+              </div>
+              <Link to="/login?demo=hospital">
+                <Button size="sm" className="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold">
+                  <span>Launch Hospital Dashboard</span>
+                  <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Role 4: HEALTH DEPARTMENT ADMIN */}
+            <div className="bg-white rounded-2xl border-2 border-blue-100 p-6 shadow-xs hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200">
+                    State Surveillance
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">Health Department Admin</h3>
+                <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                  District & state public health surveillance, epidemic cluster detection, and inventory monitoring.
+                </p>
+                <ul className="space-y-2 text-xs text-slate-600 mb-6">
+                  <li className="flex items-center gap-2">✓ Macro surveillance heatmaps & epidemiological trends</li>
+                  <li className="flex items-center gap-2 font-semibold text-blue-900">
+                    ✓ Outbreak cluster flags and referral bottleneck alerts
+                  </li>
+                  <li className="flex items-center gap-2">✓ District-wide medicine and bed inventory levels</li>
+                  <li className="flex items-center gap-2">✓ Tamper-evident governance audit log inspector</li>
+                  <li className="flex items-center gap-2">✓ Healthcare facility directory management</li>
+                </ul>
+              </div>
+              <Link to="/login?demo=admin">
+                <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                  <span>Launch Admin Dashboard</span>
+                  <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Role 5: PATIENT */}
+            <div className="bg-white rounded-2xl border-2 border-emerald-100 p-6 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between group md:col-span-2 lg:col-span-1">
               <div>
                 <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                   <User className="w-6 h-6" />
@@ -224,9 +339,9 @@ export default function LandingPage() {
                   <li className="flex items-center gap-2">✓ Hospital referral status & follow-up dates</li>
                 </ul>
               </div>
-              <Link to="/login">
-                <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-                  <span>{t('signInBtn')} as Patient</span>
+              <Link to="/login?demo=patient">
+                <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
+                  <span>Launch Patient Portal</span>
                   <ArrowRight className="w-3.5 h-3.5 ml-1" />
                 </Button>
               </Link>
