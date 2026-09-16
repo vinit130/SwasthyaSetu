@@ -3,6 +3,7 @@ const mockStore = require('../utils/mockStore');
 const MedicalDocument = require('../models/MedicalDocument');
 const Patient = require('../models/Patient');
 const { logAudit } = require('../utils/auditLogger');
+const supabaseClient = require('../utils/supabaseClient');
 
 // @desc    Get medical documents for a patient
 // @route   GET /api/documents/patient/:patientId
@@ -27,7 +28,7 @@ exports.getPatientDocuments = async (req, res, next) => {
 
     const docs = await MedicalDocument.find({ patientId })
       .populate('uploadedBy', 'name role')
-      .select('-fileData') // Exclude heavy payload in listing for performance
+      .select('-fileData') // Exclude heavy payload in listing for high-speed performance
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -59,6 +60,7 @@ exports.uploadDocument = async (req, res, next) => {
       fileSize,
       facilityName,
       doctorNotes,
+      notes,
     } = req.body;
 
     if (!patientId || !title || !documentType || !fileData) {
@@ -78,18 +80,49 @@ exports.uploadDocument = async (req, res, next) => {
     }
 
     const detectedType = mimeType || req.body.fileType || 'application/pdf';
-    const cleanNotes = doctorNotes || req.body.notes || '';
+    const cleanNotes = doctorNotes || notes || '';
+    const cleanFileName = supabaseClient.sanitizeFileName(fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`);
+    const docId = new mongoose.Types.ObjectId();
+
+    let storagePath = null;
+    let storageProvider = 'LOCAL_FALLBACK';
+    let savedFileData = fileData;
+
+    // Check if real Supabase Storage is configured
+    if (supabaseClient.isSupabaseConfigured()) {
+      try {
+        const base64Content = fileData.includes(';base64,') ? fileData.split(';base64,')[1] : fileData;
+        const fileBuffer = Buffer.from(base64Content, 'base64');
+        const targetPath = supabaseClient.buildStoragePath(patientId, docId, cleanFileName);
+
+        const uploadResult = await supabaseClient.uploadToSupabase(targetPath, fileBuffer, detectedType);
+        storagePath = uploadResult.storagePath;
+        storageProvider = 'SUPABASE';
+        savedFileData = undefined; // Drop heavy binary from MongoDB
+        console.log(`[Supabase Storage] Successfully uploaded document to ${storagePath}`);
+      } catch (uploadErr) {
+        console.warn('[Supabase Storage] Upload failed, falling back to database storage:', uploadErr.message);
+        storageProvider = 'LOCAL_FALLBACK';
+        savedFileData = fileData;
+      }
+    } else {
+      console.log('[DocumentStorage] Supabase unconfigured; persisting in local portable store.');
+    }
 
     const doc = new MedicalDocument({
+      _id: docId,
       patientId,
       title: title.trim(),
       documentType: documentType === 'SCAN_XRAY' ? 'DIAGNOSTIC_SCAN' : documentType,
-      fileName: fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`,
-      fileData,
+      fileName: cleanFileName,
+      originalFileName: fileName || cleanFileName,
+      storagePath,
+      storageProvider,
+      fileData: savedFileData,
       fileType: detectedType,
       mimeType: detectedType,
       fileSize: fileSize || Math.round(fileData.length * 0.75),
-      facilityName: facilityName || '',
+      facilityName: facilityName || req.user.facilityName || '',
       uploadedBy: req.user._id || req.user.id,
       uploaderRole: req.user.role,
       notes: cleanNotes,
@@ -104,16 +137,19 @@ exports.uploadDocument = async (req, res, next) => {
       patientId,
       action: 'UPLOAD_MEDICAL_DOCUMENT',
       role: req.user.role,
-      details: `Uploaded ${documentType}: '${title}' for patient ${patient.name} (${patient.patientId})`,
+      details: `Uploaded ${documentType}: '${title}' for patient ${patient.name} (${patient.patientId}) via ${storageProvider}`,
     });
 
-    // Return without fileData to avoid sending back large base64
+    // Return without fileData to avoid sending back large base64 payload
     const result = saved.toObject();
     delete result.fileData;
 
     res.status(201).json({
       success: true,
-      message: 'Medical document uploaded securely',
+      message: storageProvider === 'SUPABASE'
+        ? 'Medical document uploaded securely to Supabase Storage'
+        : 'Medical document uploaded securely (local fallback mode)',
+      storageProvider,
       data: result,
     });
   } catch (error) {
@@ -155,12 +191,24 @@ exports.viewDocument = async (req, res, next) => {
       patientId: doc.patientId,
       action: 'VIEW_MEDICAL_DOCUMENT',
       role: req.user.role,
-      details: `Viewed ${doc.documentType} '${doc.title}'`,
+      details: `Viewed ${doc.documentType} '${doc.title}' (Provider: ${doc.storageProvider})`,
     });
+
+    const docObj = doc.toObject();
+
+    // Generate signed URL if stored in Supabase
+    if (doc.storageProvider === 'SUPABASE' && doc.storagePath && supabaseClient.isSupabaseConfigured()) {
+      try {
+        const signedUrl = await supabaseClient.createSignedUrl(doc.storagePath, 300);
+        docObj.signedUrl = signedUrl;
+      } catch (signedErr) {
+        console.error('Failed to generate Supabase signed URL:', signedErr);
+      }
+    }
 
     res.status(200).json({
       success: true,
-      data: doc,
+      data: docObj,
     });
   } catch (error) {
     console.error('Error viewing document:', error);

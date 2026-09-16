@@ -376,7 +376,7 @@ export default function RegisterPatient() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label={t('age')}
               name="age"
@@ -389,18 +389,25 @@ export default function RegisterPatient() {
               required
             />
 
-            <Select
-              label={t('gender')}
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              options={[
-                { value: 'Male', label: t('male') },
-                { value: 'Female', label: t('female') },
-                { value: 'Other', label: t('other') },
-              ]}
-              required
-            />
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t('gender')} *</label>
+              <div className="grid grid-cols-3 gap-2">
+                {['Male', 'Female', 'Other'].map((g) => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, gender: g }))}
+                    className={`py-2 px-3 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                      formData.gender === g
+                        ? 'bg-teal-600 text-white border-teal-600 shadow-xs'
+                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    {t(g.toLowerCase()) || g}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           <Input
@@ -458,41 +465,119 @@ export default function RegisterPatient() {
             <span>{t('sectionMedicalInfo')}</span>
           </h2>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Select
-              label={t('bloodGroup')}
-              name="bloodGroup"
-              value={formData.bloodGroup}
-              onChange={handleChange}
-              options={['Unknown', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']}
-            />
-
-            <Input
-              label={t('emergencyContact')}
-              name="emergencyContact"
-              value={formData.emergencyContact}
-              onChange={handleChange}
-              placeholder="Relative phone number"
-            />
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t('bloodGroup')}</label>
+            <div className="flex flex-wrap gap-1.5">
+              {['Unknown', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bg) => (
+                <button
+                  key={bg}
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, bloodGroup: bg }))}
+                  className={`px-2.5 py-1 text-xs font-semibold rounded-md border transition-all cursor-pointer ${
+                    formData.bloodGroup === bg
+                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-2xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  {bg}
+                </button>
+              ))}
+            </div>
           </div>
 
           <Input
-            label={t('knownAllergies')}
-            name="allergies"
-            value={formData.allergies}
+            label={t('emergencyContact')}
+            name="emergencyContact"
+            value={formData.emergencyContact}
             onChange={handleChange}
-            placeholder="e.g. Penicillin, Sulfa drugs (comma separated)"
-            helperText="Separate multiple allergies with commas"
+            placeholder="Relative 10-digit phone number"
           />
 
-          <Input
-            label={t('existingConditions')}
-            name="existingConditions"
-            value={formData.existingConditions}
-            onChange={handleChange}
-            placeholder="e.g. Hypertension, Diabetes, Asthma"
-            helperText="Pre-existing diagnosed conditions"
-          />
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-700">{t('knownAllergies')}</label>
+              <span className="text-[11px] text-slate-400">Click chips to toggle</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {['None', 'Penicillin', 'Sulfa Drugs', 'Aspirin', 'Dust / Pollen', 'NSAIDs'].map((alg) => (
+                <button
+                  key={alg}
+                  type="button"
+                  onClick={() => {
+                    if (alg === 'None') {
+                      setFormData((prev) => ({ ...prev, allergies: 'None' }));
+                    } else {
+                      setFormData((prev) => {
+                        const current = prev.allergies === 'None' ? '' : prev.allergies;
+                        if (!current.trim()) return { ...prev, allergies: alg };
+                        if (current.includes(alg)) {
+                          const cleaned = current.split(',').map((s) => s.trim()).filter((s) => s !== alg).join(', ');
+                          return { ...prev, allergies: cleaned };
+                        }
+                        return { ...prev, allergies: `${current.trim()}, ${alg}` };
+                      });
+                    }
+                  }}
+                  className={`px-2 py-1 text-[11px] font-medium rounded-md border transition-colors cursor-pointer ${
+                    formData.allergies?.includes(alg)
+                      ? 'bg-rose-50 text-rose-700 border-rose-300 font-semibold'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                  }`}
+                >
+                  {alg}
+                </button>
+              ))}
+            </div>
+            <Input
+              name="allergies"
+              value={formData.allergies}
+              onChange={handleChange}
+              placeholder="e.g. Penicillin, Sulfa drugs (or type custom)"
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-700">{t('existingConditions')}</label>
+              <span className="text-[11px] text-slate-400">Click chips to toggle</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {['None', 'Diabetes', 'Hypertension', 'Asthma', 'Tuberculosis', 'Heart Disease', 'Thyroid'].map((cond) => (
+                <button
+                  key={cond}
+                  type="button"
+                  onClick={() => {
+                    if (cond === 'None') {
+                      setFormData((prev) => ({ ...prev, existingConditions: 'None' }));
+                    } else {
+                      setFormData((prev) => {
+                        const current = prev.existingConditions === 'None' ? '' : prev.existingConditions;
+                        if (!current.trim()) return { ...prev, existingConditions: cond };
+                        if (current.includes(cond)) {
+                          const cleaned = current.split(',').map((s) => s.trim()).filter((s) => s !== cond).join(', ');
+                          return { ...prev, existingConditions: cleaned };
+                        }
+                        return { ...prev, existingConditions: `${current.trim()}, ${cond}` };
+                      });
+                    }
+                  }}
+                  className={`px-2 py-1 text-[11px] font-medium rounded-md border transition-colors cursor-pointer ${
+                    formData.existingConditions?.includes(cond)
+                      ? 'bg-teal-50 text-teal-700 border-teal-300 font-semibold'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                  }`}
+                >
+                  {cond}
+                </button>
+              ))}
+            </div>
+            <Input
+              name="existingConditions"
+              value={formData.existingConditions}
+              onChange={handleChange}
+              placeholder="e.g. Hypertension, Diabetes, Asthma (or type custom)"
+            />
+          </div>
         </Card>
 
         {/* Submit Buttons */}

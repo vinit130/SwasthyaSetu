@@ -86,8 +86,8 @@ export default function ProfilePage() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{t('profile')}</h1>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{t('profile')}</h1>
+        <p className="text-xs sm:text-sm text-slate-500 mt-1">
           Manage your account credentials, regional language and contact details.
         </p>
       </div>
@@ -98,34 +98,34 @@ export default function ProfilePage() {
           <div className="w-16 h-16 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-bold text-2xl mx-auto mb-3 shadow-md shadow-teal-700/20">
             {user?.name ? user.name[0].toUpperCase() : 'U'}
           </div>
-          <h2 className="font-bold text-slate-900 dark:text-white text-base">{user?.name}</h2>
-          <span className="inline-block mt-1 text-xs px-2.5 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-semibold">
+          <h2 className="font-bold text-slate-900 text-base">{user?.name}</h2>
+          <span className="inline-block mt-1 text-xs px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200 font-semibold">
             {getRoleBadge()}
           </span>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 font-mono">{user?.email}</p>
+          <p className="text-xs text-slate-500 mt-2 font-mono">{user?.email}</p>
 
-          <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-left space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+          <div className="mt-6 pt-4 border-t border-slate-100 text-left space-y-2.5 text-xs text-slate-600">
             <div className="flex items-center gap-2">
-              <Shield className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+              <Shield className="w-3.5 h-3.5 text-teal-600" />
               <span>Role: <strong>{user?.role}</strong></span>
             </div>
             <div className="flex items-center gap-2">
-              <Globe className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+              <Globe className="w-3.5 h-3.5 text-teal-600" />
               <span>Language: <strong>{currentLangLabel}</strong></span>
             </div>
             {user?.phone && (
               <div className="flex items-center gap-2">
-                <Phone className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                <Phone className="w-3.5 h-3.5 text-teal-600" />
                 <span>{user?.phone}</span>
               </div>
             )}
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="mt-6 pt-4 border-t border-slate-100">
             <Button
               variant="secondary"
               size="sm"
-              className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-200 dark:hover:border-red-800"
+              className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 hover:border-red-200"
               onClick={() => {
                 logout();
                 window.location.href = '/login';
@@ -141,18 +141,18 @@ export default function ProfilePage() {
         <div className="md:col-span-2 space-y-6">
           {/* Personal Info */}
           <Card>
-            <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-4 flex items-center gap-2">
-              <User className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+            <h3 className="font-bold text-slate-900 text-sm mb-4 flex items-center gap-2">
+              <User className="w-4 h-4 text-teal-600" />
               <span>Personal Details & Regional Language</span>
             </h3>
 
             {profileMsg && (
               <div
                 className={`mb-4 p-3 rounded-xl text-xs flex items-center gap-2 ${
-                  profileMsg.type === 'success'
-                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                    : 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'
-                }`}
+ profileMsg.type === 'success'
+ ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 '
+ : 'bg-red-50 text-red-700 border border-red-200 '
+ }`}
               >
                 {profileMsg.type === 'success' ? (
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -179,7 +179,7 @@ export default function ProfilePage() {
               />
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Interface Language</label>
+                <label className="text-sm font-medium text-slate-700">Interface Language</label>
                 <div className="grid grid-cols-3 gap-2.5">
                   {languages.map((lang) => {
                     const isActive = language === lang.code;
@@ -189,13 +189,13 @@ export default function ProfilePage() {
                         type="button"
                         onClick={() => setLanguage(lang.code)}
                         className={`p-3 rounded-xl border text-center transition-all text-xs font-semibold ${
-                          isActive
-                            ? 'border-teal-600 bg-teal-50 dark:bg-teal-950/60 text-teal-900 dark:text-teal-200 shadow-xs ring-2 ring-teal-200 dark:ring-teal-800'
-                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
-                        }`}
+ isActive
+ ? 'border-teal-600 bg-teal-50 text-teal-900 shadow-xs ring-2 ring-teal-200 '
+ : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700 '
+ }`}
                       >
                         <span className="block font-bold text-sm mb-0.5">{lang.shortLabel}</span>
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400">{lang.label}</span>
+                        <span className="text-[10px] text-slate-500">{lang.label}</span>
                       </button>
                     );
                   })}
@@ -210,18 +210,18 @@ export default function ProfilePage() {
 
           {/* Change Password */}
           <Card>
-            <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-4 flex items-center gap-2">
-              <Lock className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+            <h3 className="font-bold text-slate-900 text-sm mb-4 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-teal-600" />
               <span>Change Security Password</span>
             </h3>
 
             {pwdMsg && (
               <div
                 className={`mb-4 p-3 rounded-xl text-xs flex items-center gap-2 ${
-                  pwdMsg.type === 'success'
-                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                    : 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'
-                }`}
+ pwdMsg.type === 'success'
+ ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 '
+ : 'bg-red-50 text-red-700 border border-red-200 '
+ }`}
               >
                 {pwdMsg.type === 'success' ? (
                   <CheckCircle2 className="w-4 h-4 shrink-0" />

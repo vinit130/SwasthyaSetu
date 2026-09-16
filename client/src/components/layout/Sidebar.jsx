@@ -85,10 +85,10 @@ export default function Sidebar() {
     : (t('patientRole') || 'Patient / Household');
 
   return (
-    <aside className="hidden md:flex flex-col w-64 shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 min-h-[calc(100vh-4rem)] p-4 justify-between transition-colors">
+    <aside className="hidden md:flex flex-col w-64 shrink-0 bg-white border-r border-slate-200/80 min-h-[calc(100vh-4rem)] p-4 justify-between transition-colors">
       <div className="space-y-1">
         <div className="px-3 py-2 mb-2">
-          <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
             {roleLabel}
           </p>
         </div>
@@ -103,10 +103,10 @@ export default function Sidebar() {
                 end={link.to.endsWith('dashboard')}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 font-semibold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
-                  } ${link.highlight ? 'text-teal-700 dark:text-teal-400 font-semibold' : ''}`
+ isActive
+ ? 'bg-teal-50 text-teal-800 font-semibold'
+ : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 '
+ } ${link.highlight ? 'text-teal-700 font-semibold' : ''}`
                 }
               >
                 <Icon className="w-4 h-4 shrink-0" />
@@ -118,12 +118,12 @@ export default function Sidebar() {
       </div>
 
       {/* Trust & Clinical Disclaimer Badge in Sidebar Footer */}
-      <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
-        <div className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-200">
-          <ShieldCheck className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] text-slate-500 space-y-1">
+        <div className="flex items-center gap-1.5 font-bold text-slate-700">
+          <ShieldCheck className="w-3.5 h-3.5 text-teal-600 shrink-0" />
           <span>{t('clinicalDecisionSupport')}</span>
         </div>
-        <p className="text-[10px] leading-tight text-slate-500 dark:text-slate-400 font-medium">
+        <p className="text-[10px] leading-tight text-slate-500 font-medium">
           {t('frontlineAdvisoryNotice')}
         </p>
       </div>

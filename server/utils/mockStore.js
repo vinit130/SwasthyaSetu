@@ -2146,7 +2146,7 @@ class MockStore {
 
   // --- Document Handlers ---
   uploadDocument(req, res) {
-    const { patientId, title, documentType, fileData, fileName, fileType, notes } = req.body;
+    const { patientId, title, documentType, fileData, fileName, fileType, notes, doctorNotes, facilityName, fileSize } = req.body;
 
     if (!patientId || !title || !fileData) {
       return res.status(400).json({
@@ -2160,24 +2160,43 @@ class MockStore {
       return res.status(404).json({ success: false, message: 'Patient record not found' });
     }
 
+    const docId = 'doc_' + Date.now();
+    const cleanFileName = fileName || `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`;
+    const cleanNotes = doctorNotes || notes || '';
+    const hasSupabase = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+
     const newDoc = {
-      _id: 'doc_' + Date.now(),
+      _id: docId,
+      id: docId,
       patientId: patient._id,
       uploadedBy: { _id: req.user?._id || DOCTOR_ID, name: req.user?.name || 'Staff', role: req.user?.role || 'DOCTOR' },
       uploaderRole: req.user?.role || 'DOCTOR',
-      facilityName: req.user?.facilityName || 'Clinical Facility',
+      facilityName: facilityName || req.user?.facilityName || 'District Hospital, Aundh, Pune',
       documentType: documentType || 'PRESCRIPTION',
       title: title.trim(),
-      fileName: fileName || 'Document.pdf',
+      fileName: cleanFileName,
+      originalFileName: cleanFileName,
+      storagePath: `${patient._id}/${docId}/${cleanFileName}`,
+      storageProvider: hasSupabase ? 'SUPABASE' : 'LOCAL_FALLBACK',
       fileType: fileType || 'application/pdf',
-      fileSize: 150000,
+      mimeType: fileType || 'application/pdf',
+      fileSize: fileSize || 150000,
       fileData, // Encoded data URI
-      notes: notes || '',
+      notes: cleanNotes,
+      doctorNotes: cleanNotes,
       createdAt: new Date().toISOString(),
     };
 
+    const result = { ...newDoc };
+    delete result.fileData;
+
     this.medicalDocuments.unshift(newDoc);
-    res.status(201).json({ success: true, message: 'Medical document uploaded securely', data: newDoc });
+    res.status(201).json({
+      success: true,
+      message: 'Medical document uploaded securely',
+      storageProvider: newDoc.storageProvider,
+      data: result,
+    });
   }
 
   getPatientDocuments(req, res) {
@@ -2191,13 +2210,21 @@ class MockStore {
       });
     }
 
-    const docs = this.medicalDocuments.filter((d) => d.patientId === patientId);
+    // Return documents without huge fileData for listing performance
+    const docs = this.medicalDocuments
+      .filter((d) => d.patientId === patientId)
+      .map((d) => {
+        const copy = { ...d };
+        delete copy.fileData;
+        return copy;
+      });
+
     res.status(200).json({ success: true, count: docs.length, data: docs });
   }
 
   viewDocument(req, res) {
     const { id } = req.params;
-    const doc = this.medicalDocuments.find((d) => d._id === id);
+    const doc = this.medicalDocuments.find((d) => d._id === id || d.id === id);
 
     if (!doc) {
       return res.status(404).json({ success: false, message: 'Medical document not found' });

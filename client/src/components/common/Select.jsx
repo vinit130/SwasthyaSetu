@@ -17,7 +17,7 @@ export default function Select({
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
       {label && (
-        <label htmlFor={selectId} className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center justify-between">
+        <label htmlFor={selectId} className="text-sm font-medium text-slate-700 flex items-center justify-between">
           <span>
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
@@ -31,11 +31,11 @@ export default function Select({
         onChange={onChange}
         disabled={disabled}
         required={required}
-        className={`w-full rounded-xl border text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 transition-colors text-base md:text-sm py-2.5 px-3.5 ${
-          error
-            ? 'border-red-400 dark:border-red-500 focus:border-red-500 focus:ring-red-200 dark:focus:ring-red-950/50'
-            : 'border-slate-300 dark:border-slate-700 focus:border-teal-600 dark:focus:border-teal-500 focus:ring-teal-100 dark:focus:ring-teal-950/50'
-        } ${disabled ? 'bg-slate-100 dark:bg-slate-800/50 cursor-not-allowed text-slate-500' : ''} min-h-[44px]`}
+        className={`w-full rounded-xl border text-slate-800 bg-white transition-colors text-base md:text-sm py-2.5 px-3.5 ${
+ error
+ ? 'border-red-400 focus:border-red-500 focus:ring-red-200 '
+ : 'border-slate-300 focus:border-teal-600 focus:ring-teal-100 '
+ } ${disabled ? 'bg-slate-100 cursor-not-allowed text-slate-500' : ''} min-h-[44px]`}
         {...props}
       >
         {options.map((opt) => {

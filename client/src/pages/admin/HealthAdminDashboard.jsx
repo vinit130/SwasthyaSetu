@@ -91,77 +91,77 @@ export default function HealthAdminDashboard() {
 
       {/* Statewide Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
+          <div className="flex items-center justify-between text-slate-500 mb-1">
             <span className="text-xs font-semibold">Total Patients</span>
             <Users className="w-4 h-4 text-slate-400" />
           </div>
-          <p className="text-2xl font-black text-slate-900 dark:text-slate-100">{d.totalPatients || 0}</p>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500">Statewide Registered</span>
+          <p className="text-2xl font-black text-slate-900">{d.totalPatients || 0}</p>
+          <span className="text-[10px] text-slate-400">Statewide Registered</span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-red-200/90 dark:border-red-900/50 shadow-2xs bg-red-50/20 dark:bg-red-950/20">
-          <div className="flex items-center justify-between text-red-600 dark:text-red-400 mb-1">
+        <div className="bg-white p-4 rounded-xl border border-red-200/90 shadow-2xs bg-red-50/20">
+          <div className="flex items-center justify-between text-red-600 mb-1">
             <span className="text-xs font-semibold">High Risk (RED)</span>
             <AlertTriangle className="w-4 h-4 text-red-500" />
           </div>
-          <p className="text-2xl font-black text-red-700 dark:text-red-300">{d.highRiskCount || 0}</p>
-          <span className="text-[10px] text-red-500 dark:text-red-400 font-medium">Critical triage flagged</span>
+          <p className="text-2xl font-black text-red-700">{d.highRiskCount || 0}</p>
+          <span className="text-[10px] text-red-500 font-medium">Critical triage flagged</span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-amber-200/90 dark:border-amber-900/50 shadow-2xs bg-amber-50/20 dark:bg-amber-950/20">
-          <div className="flex items-center justify-between text-amber-700 dark:text-amber-400 mb-1">
+        <div className="bg-white p-4 rounded-xl border border-amber-200/90 shadow-2xs bg-amber-50/20">
+          <div className="flex items-center justify-between text-amber-700 mb-1">
             <span className="text-xs font-semibold">Moderate Risk</span>
             <Activity className="w-4 h-4 text-amber-500" />
           </div>
-          <p className="text-2xl font-black text-amber-700 dark:text-amber-300">{d.mediumRiskCount || 0}</p>
-          <span className="text-[10px] text-amber-600 dark:text-amber-400">Active monitoring</span>
+          <p className="text-2xl font-black text-amber-700">{d.mediumRiskCount || 0}</p>
+          <span className="text-[10px] text-amber-600">Active monitoring</span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-blue-200/90 dark:border-blue-900/50 shadow-2xs">
-          <div className="flex items-center justify-between text-blue-600 dark:text-blue-400 mb-1">
+        <div className="bg-white p-4 rounded-xl border border-blue-200/90 shadow-2xs">
+          <div className="flex items-center justify-between text-blue-600 mb-1">
             <span className="text-xs font-semibold">Bed Occupancy</span>
             <Bed className="w-4 h-4 text-blue-500" />
           </div>
-          <p className="text-2xl font-black text-blue-700 dark:text-blue-300">{d.bedOccupancyRate || 0}%</p>
-          <span className="text-[10px] text-slate-500 dark:text-slate-400">
+          <p className="text-2xl font-black text-blue-700">{d.bedOccupancyRate || 0}%</p>
+          <span className="text-[10px] text-slate-500">
             {d.occupiedBeds || 0} / {d.totalBeds || 0} occupied
           </span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-purple-200/90 dark:border-purple-900/50 shadow-2xs">
-          <div className="flex items-center justify-between text-purple-600 dark:text-purple-400 mb-1">
+        <div className="bg-white p-4 rounded-xl border border-purple-200/90 shadow-2xs">
+          <div className="flex items-center justify-between text-purple-600 mb-1">
             <span className="text-xs font-semibold">Active Referrals</span>
             <Hospital className="w-4 h-4 text-purple-500" />
           </div>
-          <p className="text-2xl font-black text-purple-700 dark:text-purple-300">{d.activeReferrals || 0}</p>
-          <span className="text-[10px] text-purple-600 dark:text-purple-400">In hospital transit</span>
+          <p className="text-2xl font-black text-purple-700">{d.activeReferrals || 0}</p>
+          <span className="text-[10px] text-purple-600">In hospital transit</span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-orange-200/90 dark:border-orange-900/50 shadow-2xs">
-          <div className="flex items-center justify-between text-orange-600 dark:text-orange-400 mb-1">
+        <div className="bg-white p-4 rounded-xl border border-orange-200/90 shadow-2xs">
+          <div className="flex items-center justify-between text-orange-600 mb-1">
             <span className="text-xs font-semibold">Stock Alerts</span>
             <Package className="w-4 h-4 text-orange-500" />
           </div>
-          <p className="text-2xl font-black text-orange-700 dark:text-orange-300">{d.criticalShortages || 0}</p>
-          <span className="text-[10px] text-orange-600 dark:text-orange-400">Items low / out of stock</span>
+          <p className="text-2xl font-black text-orange-700">{d.criticalShortages || 0}</p>
+          <span className="text-[10px] text-orange-600">Items low / out of stock</span>
         </div>
       </div>
 
       {/* Disease Clusters & Outbreak Surveillance Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5">
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <h3 className="font-bold text-slate-900 flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-indigo-600" />
                 Active Disease Clusters & Syndromic Surveillance
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500">
                 Automated clustering from ASHA frontline screening and OPD encounters (Simulated)
               </p>
             </div>
-            <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800 animate-pulse">
+            <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-red-100 text-red-800 border border-red-200 animate-pulse">
               1 Active Cluster Alert
             </span>
           </div>
@@ -170,22 +170,22 @@ export default function HealthAdminDashboard() {
             {surveillance?.diseaseClusters?.map((c) => (
               <div
                 key={c.clusterId}
-                className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex flex-col md:flex-row items-start md:items-center justify-between gap-3"
+                className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col md:flex-row items-start md:items-center justify-between gap-3"
               >
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span
                       className={`px-2 py-0.5 text-[10px] font-bold rounded-md ${
-                        c.alertLevel === 'WARNING'
-                          ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
-                          : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
-                      }`}
+ c.alertLevel === 'WARNING'
+ ? 'bg-amber-100 text-amber-800 border border-amber-300 '
+ : 'bg-emerald-100 text-emerald-800 '
+ }`}
                     >
                       {c.alertLevel}
                     </span>
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">{c.clusterName}</h4>
+                    <h4 className="font-bold text-sm text-slate-900">{c.clusterName}</h4>
                   </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                  <p className="text-xs text-slate-600 flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-slate-400" />
                     <strong>{c.district}</strong> • Sub-District: {c.subDistrict} • Villages: {c.affectedVillages?.join(', ')}
                   </p>
@@ -193,10 +193,10 @@ export default function HealthAdminDashboard() {
 
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <span className="text-xs text-slate-500 dark:text-slate-400 block">Reported Cases</span>
-                    <span className="text-lg font-black text-indigo-700 dark:text-indigo-400">{c.caseCount}</span>
+                    <span className="text-xs text-slate-500 block">Reported Cases</span>
+                    <span className="text-lg font-black text-indigo-700">{c.caseCount}</span>
                   </div>
-                  <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                  <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700">
                     Status: {c.status}
                   </span>
                 </div>
@@ -206,32 +206,32 @@ export default function HealthAdminDashboard() {
         </div>
 
         {/* District Risk Breakdown */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between">
           <div>
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-1 flex items-center gap-2">
+            <h3 className="font-bold text-slate-900 mb-1 flex items-center gap-2">
               <MapPin className="w-4 h-4 text-emerald-600" />
               Pilot Districts Breakdown
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Patient screening risk levels by district</p>
+            <p className="text-xs text-slate-500 mb-4">Patient screening risk levels by district</p>
 
             <div className="space-y-3">
               {d.districts?.map((dist) => (
-                <div key={dist.district} className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800">
+                <div key={dist.district} className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-bold text-sm text-slate-900 dark:text-slate-100">{dist.district} District</span>
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{dist.total} screened</span>
+                    <span className="font-bold text-sm text-slate-900">{dist.district} District</span>
+                    <span className="text-xs font-bold text-slate-700">{dist.total} screened</span>
                   </div>
                   <div className="grid grid-cols-3 gap-1.5 text-center text-xs">
-                    <div className="bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 p-1.5 rounded-lg border border-red-100 dark:border-red-900/50">
-                      <span className="text-[10px] block text-red-500 dark:text-red-400">RED</span>
+                    <div className="bg-red-50 text-red-700 p-1.5 rounded-lg border border-red-100">
+                      <span className="text-[10px] block text-red-500">RED</span>
                       <strong>{dist.highRisk}</strong>
                     </div>
-                    <div className="bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 p-1.5 rounded-lg border border-amber-100 dark:border-amber-900/50">
-                      <span className="text-[10px] block text-amber-500 dark:text-amber-400">YELLOW</span>
+                    <div className="bg-amber-50 text-amber-700 p-1.5 rounded-lg border border-amber-100">
+                      <span className="text-[10px] block text-amber-500">YELLOW</span>
                       <strong>{dist.mediumRisk}</strong>
                     </div>
-                    <div className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 p-1.5 rounded-lg border border-emerald-100 dark:border-emerald-900/50">
-                      <span className="text-[10px] block text-emerald-500 dark:text-emerald-400">GREEN</span>
+                    <div className="bg-emerald-50 text-emerald-700 p-1.5 rounded-lg border border-emerald-100">
+                      <span className="text-[10px] block text-emerald-500">GREEN</span>
                       <strong>{dist.lowRisk}</strong>
                     </div>
                   </div>
@@ -240,7 +240,7 @@ export default function HealthAdminDashboard() {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 mt-4 text-[11px] text-slate-500 dark:text-slate-400 text-center">
+          <div className="pt-4 border-t border-slate-100 mt-4 text-[11px] text-slate-500 text-center">
             Simulated Regional Data • Integrated with Maharashtra Public Health facility directory standards
           </div>
         </div>

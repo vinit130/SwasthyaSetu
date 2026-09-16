@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { OfflineProvider } from './context/OfflineContext';
-import { ThemeProvider } from './context/ThemeContext';
 
 // Layout & Route Guards
 import AppLayout from './components/layout/AppLayout';
@@ -63,10 +62,9 @@ function RootRedirect() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <OfflineProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <OfflineProvider>
           <Router>
             <Routes>
               {/* Public Routes */}
@@ -303,6 +301,5 @@ export default function App() {
         </OfflineProvider>
       </AuthProvider>
     </LanguageProvider>
-  </ThemeProvider>
-);
+  );
 }

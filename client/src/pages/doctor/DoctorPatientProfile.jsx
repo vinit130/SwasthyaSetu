@@ -14,6 +14,7 @@ import {
   Clock,
   ShieldCheck,
   CheckCircle2,
+  FileText,
 } from 'lucide-react';
 import { patientAPI, referralAPI, followupAPI } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
@@ -26,6 +27,8 @@ import Input from '../../components/common/Input';
 import Select from '../../components/common/Select';
 import PatientTimeline from '../../components/patient/PatientTimeline';
 import VitalsDisplay from '../../components/patient/VitalsDisplay';
+import DocumentList from '../../components/documents/DocumentList';
+import DocumentUploadModal from '../../components/documents/DocumentUploadModal';
 import { formatDate } from '../../utils/formatters';
 
 export default function DoctorPatientProfile() {
@@ -40,6 +43,7 @@ export default function DoctorPatientProfile() {
   // Modals for Actions
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [showFollowupModal, setShowFollowupModal] = useState(false);
+  const [showDocumentModal, setShowDocumentModal] = useState(false);
 
   // Referral form state
   const [referralForm, setReferralForm] = useState({
@@ -241,6 +245,16 @@ export default function DoctorPatientProfile() {
 
             <Button
               size="md"
+              variant="outline"
+              onClick={() => setShowDocumentModal(true)}
+              className="border-teal-300 text-teal-700 hover:bg-teal-50"
+            >
+              <FileText className="w-4 h-4 mr-1.5 text-teal-600" />
+              <span>Attach Document</span>
+            </Button>
+
+            <Button
+              size="md"
               variant="secondary"
               onClick={() => setShowFollowupModal(true)}
             >
@@ -408,6 +422,16 @@ export default function DoctorPatientProfile() {
             Vitals & Screening ({visits.length})
           </button>
           <button
+            onClick={() => setActiveTab('documents')}
+            className={`pb-3 border-b-2 transition-colors whitespace-nowrap ${
+              activeTab === 'documents'
+                ? 'border-indigo-600 text-indigo-700 font-semibold'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Medical Documents & Scans
+          </button>
+          <button
             onClick={() => setActiveTab('consultations')}
             className={`pb-3 border-b-2 transition-colors whitespace-nowrap ${
               activeTab === 'consultations'
@@ -496,6 +520,15 @@ export default function DoctorPatientProfile() {
             </Card>
           ))}
         </div>
+      )}
+
+      {activeTab === 'documents' && (
+        <DocumentList
+          patientId={id}
+          patientName={patient.name}
+          canUpload={true}
+          onDocumentAdded={() => fetchProfile()}
+        />
       )}
 
       {activeTab === 'consultations' && (
@@ -747,6 +780,17 @@ export default function DoctorPatientProfile() {
           </div>
         </form>
       </Modal>
+
+      {/* Document Upload Modal */}
+      {showDocumentModal && (
+        <DocumentUploadModal
+          isOpen={showDocumentModal}
+          onClose={() => setShowDocumentModal(false)}
+          patientId={id}
+          patientName={patient.name}
+          onUploaded={() => fetchProfile()}
+        />
+      )}
     </div>
   );
 }

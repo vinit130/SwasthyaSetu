@@ -24,7 +24,19 @@ const medicalDocumentSchema = new mongoose.Schema(
     },
     documentType: {
       type: String,
-      enum: ['PRESCRIPTION', 'LAB_REPORT', 'DISCHARGE_SUMMARY', 'REFERRAL_SLIP', 'DIAGNOSTIC_SCAN', 'OTHER'],
+      enum: [
+        'PRESCRIPTION',
+        'LAB_REPORT',
+        'BLOOD_TEST',
+        'IMAGING_REPORT',
+        'CT_SCAN',
+        'X_RAY',
+        'ULTRASOUND',
+        'DISCHARGE_SUMMARY',
+        'REFERRAL_SLIP',
+        'DIAGNOSTIC_SCAN',
+        'OTHER',
+      ],
       default: 'PRESCRIPTION',
       required: true,
       index: true,
@@ -38,21 +50,43 @@ const medicalDocumentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    originalFileName: {
+      type: String,
+      default: '',
+    },
     fileType: {
       type: String,
-      enum: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
+      default: 'application/pdf',
       required: true,
+    },
+    mimeType: {
+      type: String,
+      default: 'application/pdf',
     },
     fileSize: {
       type: Number,
-      max: [5242880, 'File size cannot exceed 5MB'],
+      max: [10485760, 'File size cannot exceed 10MB'],
       required: true,
+    },
+    storageProvider: {
+      type: String,
+      enum: ['SUPABASE', 'LOCAL_FALLBACK'],
+      default: 'SUPABASE',
+    },
+    storagePath: {
+      type: String,
+      default: null,
+      index: true,
     },
     fileData: {
-      type: String, // Base64 data URI for safe portable storage abstraction
-      required: true,
+      type: String, // Base64 fallback when Supabase is not configured
+      required: false,
     },
     notes: {
+      type: String,
+      default: '',
+    },
+    doctorNotes: {
       type: String,
       default: '',
     },

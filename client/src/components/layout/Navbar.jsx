@@ -16,7 +16,6 @@ import { useOffline } from '../../context/OfflineContext';
 import Button from '../common/Button';
 import Logo from '../common/Logo';
 import LanguageSelector from '../common/LanguageSelector';
-import ThemeToggle from '../common/ThemeToggle';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -56,17 +55,17 @@ export default function Navbar() {
     : 'PATIENT';
 
   const roleBadgeStyle = isAsha
-    ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800'
+    ? 'bg-teal-50 text-teal-800 border border-teal-200'
     : isDoctor
-    ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+    ? 'bg-indigo-50 text-indigo-800 border border-indigo-200'
     : isHospital
-    ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+    ? 'bg-rose-50 text-rose-800 border border-rose-200'
     : isAdmin
-    ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
-    : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+    ? 'bg-blue-50 text-blue-800 border border-blue-200'
+    : 'bg-emerald-50 text-emerald-800 border border-emerald-200';
 
   return (
-    <header className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200/90 dark:border-slate-800 shadow-2xs transition-colors">
+    <header className="sticky top-0 z-30 bg-white border-b border-slate-200/90 shadow-2xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Left: Brand / Logo */}
         <Link to={homePath} className="flex items-center gap-3 group">
@@ -84,16 +83,16 @@ export default function Navbar() {
           <button
             onClick={toggleSimulateOffline}
             title={isOnline ? 'Network Online (Click to test Offline mode)' : 'Network Offline'}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
               isOnline
-                ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
-                : 'bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border-amber-300 dark:border-amber-700'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                : 'bg-amber-100 text-amber-900 border-amber-300'
             }`}
           >
             {isOnline ? (
-              <Wifi className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <Wifi className="w-3.5 h-3.5 text-emerald-600" />
             ) : (
-              <WifiOff className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 animate-pulse" />
+              <WifiOff className="w-3.5 h-3.5 text-amber-700 animate-pulse" />
             )}
             <span className="hidden md:inline font-semibold">
               {isOnline ? t('onlineStatus') : t('offlineStatus')}
@@ -108,16 +107,13 @@ export default function Navbar() {
           {/* Trilingual Selector */}
           <LanguageSelector variant="dropdown" />
 
-          {/* Dark / Light Mode Toggle */}
-          <ThemeToggle />
-
           {/* User Profile info */}
           <Link
             to="/profile"
-            className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors text-xs font-medium"
+            className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-lg hover:bg-slate-100 text-slate-700 transition-colors text-xs font-medium"
             title="My Profile"
           >
-            <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-semibold text-xs">
+            <div className="w-7 h-7 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-semibold text-xs">
               {user?.name ? user.name[0].toUpperCase() : 'U'}
             </div>
             <span className="hidden lg:inline max-w-[120px] truncate">{user?.name}</span>
@@ -126,7 +122,7 @@ export default function Navbar() {
           {/* Logout Button */}
           <button
             onClick={handleLogout}
-            className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
+            className="p-2 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
             title={t('logout')}
           >
             <LogOut className="w-4 h-4" />

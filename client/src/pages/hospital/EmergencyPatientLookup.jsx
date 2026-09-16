@@ -70,18 +70,18 @@ export default function EmergencyPatientLookup() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Warning Banner */}
-      <div className="bg-red-50 dark:bg-red-950/40 border-2 border-red-300 dark:border-red-800 rounded-2xl p-5 shadow-xs flex items-start gap-4">
-        <div className="p-2.5 bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-300 rounded-xl shrink-0 mt-0.5">
+      <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-5 shadow-xs flex items-start gap-4">
+        <div className="p-2.5 bg-red-100 text-red-700 rounded-xl shrink-0 mt-0.5">
           <AlertOctagon className="w-6 h-6" />
         </div>
         <div>
-          <h2 className="text-lg font-black text-red-900 dark:text-red-200 tracking-tight flex items-center gap-2">
+          <h2 className="text-lg font-black text-red-900 tracking-tight flex items-center gap-2">
             Emergency Break-Glass Direct Access Protocol
           </h2>
-          <p className="text-xs text-red-700 dark:text-red-300 mt-1 leading-relaxed">
+          <p className="text-xs text-red-700 mt-1 leading-relaxed">
             This privileged capability allows District Hospital clinicians to access statewide patient health records during critical trauma, unconscious patient arrivals, or direct 108 ambulance drop-offs without prior referral.
           </p>
-          <div className="mt-2.5 inline-flex items-center gap-1.5 text-[11px] font-bold text-red-800 dark:text-red-300 bg-red-100/70 dark:bg-red-900/40 px-2.5 py-1 rounded-lg border border-red-200 dark:border-red-800">
+          <div className="mt-2.5 inline-flex items-center gap-1.5 text-[11px] font-bold text-red-800 bg-red-100/70 px-2.5 py-1 rounded-lg border border-red-200">
             <ShieldAlert className="w-3.5 h-3.5" />
             Mandatory Compliance Notice: All queries are permanently signed and logged to the state audit trail.
           </div>
@@ -89,11 +89,11 @@ export default function EmergencyPatientLookup() {
       </div>
 
       {/* Break Glass Form */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         <form onSubmit={handleBreakGlassSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1">
                 Patient Identifier (10-Digit Mobile or Patient ID) *
               </label>
               <div className="relative">
@@ -103,21 +103,21 @@ export default function EmergencyPatientLookup() {
                   placeholder="e.g. 9876500001 or SS-2026-0001"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-mono border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-mono border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
                   required
                 />
               </div>
               <button
                 type="button"
                 onClick={() => setIdentifier('9876500001')}
-                className="mt-1 text-[11px] text-purple-700 dark:text-purple-400 hover:underline font-medium"
+                className="mt-1 text-[11px] text-purple-700 hover:underline font-medium"
               >
                 Fill demo patient phone (9876500001)
               </button>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1">
                 Attending Specialist / Medical Officer *
               </label>
               <input
@@ -125,20 +125,20 @@ export default function EmergencyPatientLookup() {
                 placeholder="Dr. Suresh Patil"
                 value={attendingDoctor}
                 onChange={(e) => setAttendingDoctor(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-xs font-bold text-slate-700 mb-1">
               Mandatory Clinical Justification Reason *
             </label>
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 bg-white mb-2"
+              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 bg-white mb-2"
             >
               <option value="Acute trauma / unconscious patient arrived directly via 108 ambulance">
                 Acute trauma / unconscious patient arrived directly via 108 ambulance
@@ -159,7 +159,7 @@ export default function EmergencyPatientLookup() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-xs font-bold text-slate-700 mb-1">
               Triage Notes & Arrival Circumstances
             </label>
             <textarea
@@ -167,12 +167,12 @@ export default function EmergencyPatientLookup() {
               placeholder="e.g. Arrived in Emergency Ward at 20:15 via 108. SpO2 88%, BP 160/100."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
             />
           </div>
 
           <div className="pt-2 flex items-center justify-between">
-            <span className="text-[11px] text-slate-400 dark:text-slate-500 italic">
+            <span className="text-[11px] text-slate-400 italic">
               Access will be recorded under your login identity
             </span>
 
@@ -187,7 +187,7 @@ export default function EmergencyPatientLookup() {
         </form>
 
         {error && (
-          <div className="p-3.5 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 text-xs rounded-xl flex items-center gap-2 border border-red-200 dark:border-red-800">
+          <div className="p-3.5 bg-red-50 text-red-700 text-xs rounded-xl flex items-center gap-2 border border-red-200">
             <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
             <span>{error}</span>
           </div>
@@ -196,33 +196,33 @@ export default function EmergencyPatientLookup() {
 
       {/* Patient Record Found */}
       {patient && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-emerald-300 dark:border-emerald-700 shadow-lg overflow-hidden animate-fadeIn">
-          <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
+        <div className="bg-white rounded-2xl border-2 border-emerald-300 shadow-lg overflow-hidden animate-fadeIn">
+          <div className="p-4 bg-emerald-50 border-b border-emerald-200 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-emerald-600" />
-              <span className="font-bold text-sm text-emerald-900 dark:text-emerald-200">
+              <span className="font-bold text-sm text-emerald-900">
                 Break-Glass Access Approved & Logged to Compliance Trail
               </span>
             </div>
-            <span className="text-[11px] font-mono text-emerald-700 dark:text-emerald-300">AUDIT ID: #{Date.now().toString().slice(-6)}</span>
+            <span className="text-[11px] font-mono text-emerald-700">AUDIT ID: #{Date.now().toString().slice(-6)}</span>
           </div>
 
           <div className="p-6 space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
-                <h3 className="text-xl font-black text-slate-900 dark:text-slate-100">{patient.name}</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  ID: <strong className="text-slate-800 dark:text-slate-200">{patient.patientId}</strong> • {patient.gender}, {patient.age} yrs • Blood Group: <strong className="text-red-700 dark:text-red-400">{patient.bloodGroup || 'Unknown'}</strong>
+                <h3 className="text-xl font-black text-slate-900">{patient.name}</h3>
+                <p className="text-xs text-slate-500">
+                  ID: <strong className="text-slate-800">{patient.patientId}</strong> • {patient.gender}, {patient.age} yrs • Blood Group: <strong className="text-red-700">{patient.bloodGroup || 'Unknown'}</strong>
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Address: {patient.village}, {patient.district}, {patient.state} • Mobile: <strong className="dark:text-slate-200">+91 {patient.phone}</strong>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Address: {patient.village}, {patient.district}, {patient.state} • Mobile: <strong className="">+91 {patient.phone}</strong>
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
                 <Link
                   to={`/hospital/beds?patientId=${patient._id || patient.id}`}
-                  className="px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl border border-slate-300 dark:border-slate-700 flex items-center gap-1.5"
+                  className="px-4 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl border border-slate-300 flex items-center gap-1.5"
                 >
                   <Bed className="w-3.5 h-3.5 text-blue-600" />
                   Assign Bed
@@ -239,33 +239,33 @@ export default function EmergencyPatientLookup() {
 
             {/* Medical Alerts & Background */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div className="p-3.5 rounded-xl bg-red-50/60 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
-                <span className="text-red-900 dark:text-red-200 font-bold block mb-1">Known Allergies:</span>
+              <div className="p-3.5 rounded-xl bg-red-50/60 border border-red-200">
+                <span className="text-red-900 font-bold block mb-1">Known Allergies:</span>
                 {patient.allergies?.length > 0 ? (
                   <div className="flex flex-wrap gap-1">
                     {patient.allergies.map((a, idx) => (
-                      <span key={idx} className="bg-white dark:bg-slate-800 text-red-700 dark:text-red-300 px-2 py-0.5 rounded border border-red-200 dark:border-red-800 font-medium">
+                      <span key={idx} className="bg-white text-red-700 px-2 py-0.5 rounded border border-red-200 font-medium">
                         {a}
                       </span>
                     ))}
                   </div>
                 ) : (
-                  <span className="text-slate-500 dark:text-slate-400">No known drug allergies reported</span>
+                  <span className="text-slate-500">No known drug allergies reported</span>
                 )}
               </div>
 
-              <div className="p-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
-                <span className="text-amber-900 dark:text-amber-200 font-bold block mb-1">Existing Chronic Conditions:</span>
+              <div className="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200">
+                <span className="text-amber-900 font-bold block mb-1">Existing Chronic Conditions:</span>
                 {patient.existingConditions?.length > 0 ? (
                   <div className="flex flex-wrap gap-1">
                     {patient.existingConditions.map((c, idx) => (
-                      <span key={idx} className="bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800 font-medium">
+                      <span key={idx} className="bg-white text-amber-700 px-2 py-0.5 rounded border border-amber-200 font-medium">
                         {c}
                       </span>
                     ))}
                   </div>
                 ) : (
-                  <span className="text-slate-500 dark:text-slate-400">No chronic medical conditions on record</span>
+                  <span className="text-slate-500">No chronic medical conditions on record</span>
                 )}
               </div>
             </div>

@@ -84,8 +84,8 @@ export default function AshaPatients() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{t('patients')}</h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{t('patients')}</h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Village registry, longitudinal profiles and frontline screenings.
           </p>
         </div>
@@ -108,7 +108,7 @@ export default function AshaPatients() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t('searchPlaceholder')}
-              className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:border-teal-600 dark:focus:border-teal-500 focus:ring-teal-100 placeholder-slate-400 dark:placeholder-slate-500"
+              className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-300 bg-white text-slate-800 focus:border-teal-600 focus:ring-teal-100 placeholder-slate-400"
             />
           </div>
 
@@ -117,7 +117,7 @@ export default function AshaPatients() {
             <select
               value={riskFilter}
               onChange={(e) => setRiskFilter(e.target.value)}
-              className="w-full md:w-48 py-2 px-3 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:border-teal-600 dark:focus:border-teal-500"
+              className="w-full md:w-48 py-2 px-3 text-sm rounded-xl border border-slate-300 bg-white text-slate-800 focus:border-teal-600"
             >
               <option value="">{t('allCases')}</option>
               <option value="PENDING_REVIEW">{t('riskPending')}</option>
@@ -149,9 +149,9 @@ export default function AshaPatients() {
           </div>
 
           {/* Desktop Table */}
-          <div className="hidden lg:block bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs transition-colors">
+          <div className="hidden lg:block bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs transition-colors">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase text-[11px] font-semibold">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[11px] font-semibold">
                 <tr>
                   <th className="py-3 px-5">Patient Name</th>
                   <th className="py-3 px-4">Patient ID</th>
@@ -163,16 +163,16 @@ export default function AshaPatients() {
                   <th className="py-3 px-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              <tbody className="divide-y divide-slate-100">
                 {patients.map((p) => (
-                  <tr key={p._id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/50 transition-colors">
-                    <td className="py-3.5 px-5 font-semibold text-slate-900 dark:text-white">{p.name}</td>
-                    <td className="py-3.5 px-4 font-mono text-xs text-slate-500 dark:text-slate-400">{p.patientId}</td>
-                    <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 text-xs">
+                  <tr key={p._id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-3.5 px-5 font-semibold text-slate-900">{p.name}</td>
+                    <td className="py-3.5 px-4 font-mono text-xs text-slate-500">{p.patientId}</td>
+                    <td className="py-3.5 px-4 text-slate-600 text-xs">
                       {p.age} yrs • {p.gender}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 text-xs">{p.village}</td>
-                    <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 text-xs">
+                    <td className="py-3.5 px-4 text-slate-600 text-xs">{p.village}</td>
+                    <td className="py-3.5 px-4 text-slate-500 text-xs">
                       {p.latestVisit?.visitDate ? formatDate(p.latestVisit.visitDate) : '-'}
                     </td>
                     <td className="py-3.5 px-4">

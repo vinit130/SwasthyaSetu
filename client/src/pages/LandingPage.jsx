@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -21,7 +21,6 @@ import {
 import Button from '../components/common/Button';
 import Logo from '../components/common/Logo';
 import LanguageSelector from '../components/common/LanguageSelector';
-import ThemeToggle from '../components/common/ThemeToggle';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function LandingPage() {
@@ -49,9 +48,9 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col selection:bg-teal-100 selection:text-teal-900 transition-colors">
+    <div className="min-h-screen bg-white text-slate-900 flex flex-col selection:bg-teal-100 selection:text-teal-900">
       {/* Top Navbar */}
-      <nav className="border-b border-slate-200/80 dark:border-slate-800 sticky top-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md z-30 shadow-2xs transition-colors">
+      <nav className="border-b border-slate-200/80 sticky top-0 bg-white/95 backdrop-blur-md z-30 shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
             <Logo size="md" showWordmark={true} />
@@ -60,7 +59,6 @@ export default function LandingPage() {
           <div className="flex items-center gap-2.5 sm:gap-4">
             <LanguageSelector variant="pill" className="hidden sm:inline-flex" />
             <LanguageSelector variant="dropdown" className="sm:hidden" />
-            <ThemeToggle />
             <Link to="/login">
               <Button size="sm" variant="primary" className="shadow-sm">
                 <span>{t('signInBtn')}</span>
@@ -72,21 +70,21 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-16 md:pt-20 md:pb-24 hero-mesh border-b border-slate-200/80 dark:border-slate-800">
+      <section className="relative overflow-hidden pt-12 pb-16 md:pt-20 md:pb-24 hero-mesh border-b border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-100/90 dark:bg-teal-950/80 text-teal-900 dark:text-teal-200 text-xs font-bold mb-6 border border-teal-300 dark:border-teal-700 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-teal-600 dark:bg-teal-400 animate-pulse"></span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-100/90 text-teal-900 text-xs font-bold mb-6 border border-teal-300 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-teal-600 animate-pulse"></span>
             3-Role Rural Healthcare Platform • Village to Hospital to Follow-up
           </div>
 
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight max-w-4xl mx-auto leading-tight">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight max-w-4xl mx-auto leading-tight">
             {t('landingHeroTitle1')}{' '}
-            <span className="bg-linear-to-r from-teal-600 to-emerald-600 dark:from-teal-400 dark:to-emerald-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
               {t('landingHeroTitle2')}
             </span>
           </h1>
 
-          <p className="mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-6 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
             {t('landingHeroSubtitle')}
           </p>
 
@@ -105,12 +103,12 @@ export default function LandingPage() {
           </div>
 
           {/* Responsible Decision Support Disclaimer */}
-          <div className="mt-12 max-w-3xl mx-auto p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs border border-slate-200 dark:border-slate-800 shadow-xs rounded-2xl flex items-start gap-3 text-left">
-            <div className="w-8 h-8 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 flex items-center justify-center shrink-0 mt-0.5">
+          <div className="mt-12 max-w-3xl mx-auto p-4 bg-white/95 backdrop-blur-xs border border-slate-200 shadow-xs rounded-2xl flex items-start gap-3 text-left">
+            <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0 mt-0.5">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              <strong className="text-slate-800 dark:text-slate-100 font-bold block mb-0.5">
+            <div className="text-xs text-slate-600 leading-relaxed">
+              <strong className="text-slate-800 font-bold block mb-0.5">
                 {t('clinicalDecisionSupport')}:
               </strong>
               {t('disclaimer')}
@@ -120,17 +118,17 @@ export default function LandingPage() {
       </section>
 
       {/* 3 User Roles Architecture Section */}
-      <section id="three-roles" className="py-16 md:py-24 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 transition-colors">
+      <section id="three-roles" className="py-16 md:py-24 bg-white border-b border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold mb-2">
+              <Sparkles className="w-3.5 h-3.5 text-teal-600" />
               <span>Architectural Foundation</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
               {t('rolesTitle')}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
+            <p className="text-xs sm:text-sm text-slate-500 mt-2">
               {t('rolesSubtitle')}
             </p>
           </div>
@@ -138,21 +136,21 @@ export default function LandingPage() {
           {/* 3 Role Cards */}
           <div className="grid md:grid-cols-3 gap-6">
             {/* Role 1: ASHA */}
-            <div className="bg-white dark:bg-slate-950 rounded-2xl border-2 border-teal-100 dark:border-teal-900/50 p-6 shadow-xs hover:shadow-md hover:border-teal-300 dark:hover:border-teal-700 transition-all flex flex-col justify-between group">
+            <div className="bg-white rounded-2xl border-2 border-teal-100 p-6 shadow-xs hover:shadow-md hover:border-teal-300 transition-all flex flex-col justify-between group">
               <div>
-                <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                   <Users className="w-6 h-6" />
                 </div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
+                  <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
                     Frontline Worker
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{t('roleAshaTitle')}</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{t('roleAshaTitle')}</h3>
+                <p className="text-xs text-slate-600 leading-relaxed mb-4">
                   {t('roleAshaDesc')}
                 </p>
-                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 mb-6">
+                <ul className="space-y-2 text-xs text-slate-600 mb-6">
                   <li className="flex items-center gap-2">✓ Village household intake with duplicate check</li>
                   <li className="flex items-center gap-2">✓ Physiological vitals & symptoms screening</li>
                   <li className="flex items-center gap-2">✓ Real-time advisory risk indication</li>
@@ -169,23 +167,23 @@ export default function LandingPage() {
             </div>
 
             {/* Role 2: DOCTOR */}
-            <div className="bg-white dark:bg-slate-950 rounded-2xl border-2 border-indigo-100 dark:border-indigo-900/50 p-6 shadow-xs hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all flex flex-col justify-between group">
+            <div className="bg-white rounded-2xl border-2 border-indigo-100 p-6 shadow-xs hover:shadow-md hover:border-indigo-300 transition-all flex flex-col justify-between group">
               <div>
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                   <Stethoscope className="w-6 h-6" />
                 </div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200">
                     Clinical Review
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{t('roleDoctorTitle')}</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{t('roleDoctorTitle')}</h3>
+                <p className="text-xs text-slate-600 leading-relaxed mb-4">
                   {t('roleDoctorDesc')}
                 </p>
-                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 mb-6">
+                <ul className="space-y-2 text-xs text-slate-600 mb-6">
                   <li className="flex items-center gap-2">✓ Prioritized triage review queue (Urgent RED first)</li>
-                  <li className="flex items-center gap-2 font-semibold text-indigo-900 dark:text-indigo-300">
+                  <li className="flex items-center gap-2 font-semibold text-indigo-900">
                     ✓ Authoritatively confirms Green, Yellow, or Red risk
                   </li>
                   <li className="flex items-center gap-2">✓ Structured clinical impressions & prescriptions</li>
@@ -202,23 +200,23 @@ export default function LandingPage() {
             </div>
 
             {/* Role 3: PATIENT */}
-            <div className="bg-white dark:bg-slate-950 rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/50 p-6 shadow-xs hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700 transition-all flex flex-col justify-between group">
+            <div className="bg-white rounded-2xl border-2 border-emerald-100 p-6 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between group">
               <div>
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                   <User className="w-6 h-6" />
                 </div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                     Care Journey
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{t('rolePatientTitle')}</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{t('rolePatientTitle')}</h3>
+                <p className="text-xs text-slate-600 leading-relaxed mb-4">
                   {t('rolePatientDesc')}
                 </p>
-                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 mb-6">
+                <ul className="space-y-2 text-xs text-slate-600 mb-6">
                   <li className="flex items-center gap-2">✓ Unique Patient ID & portal credentials</li>
-                  <li className="flex items-center gap-2 font-semibold text-emerald-900 dark:text-emerald-300">
+                  <li className="flex items-center gap-2 font-semibold text-emerald-900">
                     ✓ Doctor-confirmed risk status & clinical advice
                   </li>
                   <li className="flex items-center gap-2">✓ 6-step visual care journey timeline</li>
@@ -238,11 +236,11 @@ export default function LandingPage() {
       </section>
 
       {/* Continuum of Care: Step-by-Step Workflow */}
-      <section className="py-16 md:py-24 bg-slate-50/50 dark:bg-slate-950/60 border-b border-slate-200/80 dark:border-slate-800 transition-colors">
+      <section className="py-16 md:py-24 bg-slate-50/50 border-b border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-xs font-bold text-teal-700 dark:text-teal-400 uppercase tracking-widest">{t('continuumTitle')}</h2>
-            <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mt-1">
+            <h2 className="text-xs font-bold text-teal-700 uppercase tracking-widest">{t('continuumTitle')}</h2>
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
               {t('continuumSubtitle')}
             </p>
           </div>
@@ -253,19 +251,19 @@ export default function LandingPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-2xs hover:shadow-md hover:border-teal-300 dark:hover:border-teal-600 transition-all flex flex-col justify-between"
+                  className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs hover:shadow-md hover:border-teal-300 transition-all flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3.5">
-                      <span className="text-xs font-mono font-bold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 px-2.5 py-0.5 rounded-lg border border-teal-200 dark:border-teal-800">
+                      <span className="text-xs font-mono font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-lg border border-teal-200">
                         {step.num}
                       </span>
-                      <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/60 flex items-center justify-center text-teal-700 dark:text-teal-400">
+                      <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-700">
                         <Icon className="w-4 h-4" />
                       </div>
                     </div>
-                    <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-1">{step.title}</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{step.desc}</p>
+                    <h3 className="font-bold text-slate-900 text-sm mb-1">{step.title}</h3>
+                    <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
                   </div>
                 </div>
               );
@@ -275,11 +273,11 @@ export default function LandingPage() {
       </section>
 
       {/* Trust & Clinical Governance */}
-      <section className="py-16 md:py-24 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 transition-colors">
+      <section className="py-16 md:py-24 bg-white border-b border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-xs font-bold text-teal-700 dark:text-teal-400 uppercase tracking-widest">Platform Strengths</h2>
-            <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mt-1">
+            <h2 className="text-xs font-bold text-teal-700 uppercase tracking-widest">Platform Strengths</h2>
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
               {t('trustTitle')}
             </p>
           </div>
@@ -290,13 +288,13 @@ export default function LandingPage() {
               return (
                 <div
                   key={index}
-                  className="p-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-950 hover:shadow-md hover:border-teal-300 dark:hover:border-teal-600 transition-all"
+                  className="p-5 rounded-2xl border border-slate-200/90 bg-white hover:shadow-md hover:border-teal-300 transition-all"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 flex items-center justify-center mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center mb-3">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">{feat.title}</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{feat.desc}</p>
+                  <h3 className="text-sm font-bold text-slate-900 mb-1">{feat.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{feat.desc}</p>
                 </div>
               );
             })}

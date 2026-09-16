@@ -26,7 +26,7 @@ export default function MobileNav() {
   if (!user) return null;
 
   return (
-    <nav aria-label="Mobile navigation" className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 z-40 px-2 py-1 shadow-lg transition-colors">
+    <nav aria-label="Mobile navigation" className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 px-2 py-1 shadow-lg transition-colors">
       <div className="flex items-center justify-around max-w-md mx-auto">
         {isAsha ? (
           <>
@@ -34,8 +34,8 @@ export default function MobileNav() {
               to="/asha/dashboard"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-teal-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <LayoutDashboard className="w-5 h-5 mb-0.5" />
@@ -46,8 +46,8 @@ export default function MobileNav() {
               to="/asha/patients"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-teal-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <Users className="w-5 h-5 mb-0.5" />
@@ -63,7 +63,7 @@ export default function MobileNav() {
               <div className="w-12 h-12 rounded-full bg-teal-600 text-white flex items-center justify-center shadow-md shadow-teal-700/30 active:scale-95 transition-transform">
                 <UserPlus className="w-6 h-6" />
               </div>
-              <span className="text-[10px] font-semibold text-teal-800 dark:text-teal-300 mt-0.5 truncate max-w-[50px]">
+              <span className="text-[10px] font-semibold text-teal-800 mt-0.5 truncate max-w-[50px]">
                 {t('registerPatient')}
               </span>
             </NavLink>
@@ -72,8 +72,8 @@ export default function MobileNav() {
               to="/asha/referrals"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-teal-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <Share2 className="w-5 h-5 mb-0.5" />
@@ -84,8 +84,8 @@ export default function MobileNav() {
               to="/asha/followups"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-teal-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <CalendarCheck className="w-5 h-5 mb-0.5" />
@@ -98,8 +98,8 @@ export default function MobileNav() {
               to="/doctor/dashboard"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-teal-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <LayoutDashboard className="w-5 h-5 mb-0.5" />
@@ -110,8 +110,8 @@ export default function MobileNav() {
               to="/doctor/reviews"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-teal-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <Clock className="w-5 h-5 mb-0.5" />
@@ -122,8 +122,8 @@ export default function MobileNav() {
               to="/doctor/patients"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-teal-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <Users className="w-5 h-5 mb-0.5" />
@@ -134,8 +134,8 @@ export default function MobileNav() {
               to="/doctor/consultations"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-teal-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <Stethoscope className="w-5 h-5 mb-0.5" />
@@ -146,8 +146,8 @@ export default function MobileNav() {
               to="/doctor/referrals"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-teal-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <Share2 className="w-5 h-5 mb-0.5" />
@@ -160,8 +160,8 @@ export default function MobileNav() {
               to="/hospital/dashboard"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-rose-700 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-rose-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <LayoutDashboard className="w-5 h-5 mb-0.5" />
@@ -172,8 +172,8 @@ export default function MobileNav() {
               to="/hospital/referrals"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-rose-700 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-rose-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <Share2 className="w-5 h-5 mb-0.5" />
@@ -184,8 +184,8 @@ export default function MobileNav() {
               to="/hospital/beds"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-rose-700 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-rose-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <Building className="w-5 h-5 mb-0.5" />
@@ -196,8 +196,8 @@ export default function MobileNav() {
               to="/hospital/treatment"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-rose-700 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-rose-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <Stethoscope className="w-5 h-5 mb-0.5" />
@@ -208,8 +208,8 @@ export default function MobileNav() {
               to="/hospital/emergency"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-rose-700 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-rose-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <ShieldCheck className="w-5 h-5 mb-0.5" />
@@ -222,8 +222,8 @@ export default function MobileNav() {
               to="/admin/dashboard"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-blue-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <LayoutDashboard className="w-5 h-5 mb-0.5" />
@@ -234,8 +234,8 @@ export default function MobileNav() {
               to="/admin/facilities"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-blue-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <Building className="w-5 h-5 mb-0.5" />
@@ -246,8 +246,8 @@ export default function MobileNav() {
               to="/admin/audit-logs"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-blue-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <ShieldCheck className="w-5 h-5 mb-0.5" />
@@ -258,8 +258,8 @@ export default function MobileNav() {
               to="/profile"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-blue-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <User className="w-5 h-5 mb-0.5" />
@@ -272,8 +272,8 @@ export default function MobileNav() {
               to="/patient/dashboard"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-teal-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <LayoutDashboard className="w-5 h-5 mb-0.5" />
@@ -284,8 +284,8 @@ export default function MobileNav() {
               to="/profile"
               className={({ isActive }) =>
                 `flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors ${
-                  isActive ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
-                }`
+ isActive ? 'text-teal-700 ' : 'text-slate-500 '
+ }`
               }
             >
               <User className="w-5 h-5 mb-0.5" />

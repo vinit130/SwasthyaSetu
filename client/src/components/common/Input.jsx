@@ -20,7 +20,7 @@ export default function Input({
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
       {label && (
-        <label htmlFor={inputId} className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center justify-between">
+        <label htmlFor={inputId} className="text-sm font-medium text-slate-700 flex items-center justify-between">
           <span>
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
@@ -30,7 +30,7 @@ export default function Input({
 
       <div className="relative">
         {Icon && (
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
             <Icon className="w-5 h-5" />
           </div>
         )}
@@ -42,23 +42,23 @@ export default function Input({
           placeholder={placeholder}
           disabled={disabled}
           required={required}
-          className={`w-full rounded-xl border text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition-colors text-base md:text-sm py-2.5 ${
-            Icon ? 'pl-11 pr-3.5' : 'px-3.5'
-          } ${
-            error
-              ? 'border-red-400 dark:border-red-500 focus:border-red-500 focus:ring-red-200 dark:focus:ring-red-950/50'
-              : 'border-slate-300 dark:border-slate-700 focus:border-teal-600 dark:focus:border-teal-500 focus:ring-teal-100 dark:focus:ring-teal-950/50'
-          } ${disabled ? 'bg-slate-100 dark:bg-slate-800/50 cursor-not-allowed text-slate-500' : 'bg-white dark:bg-slate-800'} min-h-[44px]`}
+          className={`w-full rounded-xl border text-slate-800 placeholder-slate-400 transition-colors text-base md:text-sm py-2.5 ${
+ Icon ? 'pl-11 pr-3.5' : 'px-3.5'
+ } ${
+ error
+ ? 'border-red-400 focus:border-red-500 focus:ring-red-200 '
+ : 'border-slate-300 focus:border-teal-600 focus:ring-teal-100 '
+ } ${disabled ? 'bg-slate-100 cursor-not-allowed text-slate-500' : 'bg-white '} min-h-[44px]`}
           {...props}
         />
       </div>
 
       {error ? (
-        <p className="text-xs text-red-600 dark:text-red-400 flex items-center gap-1 mt-0.5">
+        <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
           <span>•</span> {error}
         </p>
       ) : helperText ? (
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{helperText}</p>
+        <p className="text-xs text-slate-500 mt-0.5">{helperText}</p>
       ) : null}
     </div>
   );

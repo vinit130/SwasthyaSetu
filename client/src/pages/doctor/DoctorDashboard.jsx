@@ -62,10 +62,10 @@ export default function DoctorDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             {t('goodMorning')}, {user?.name || 'Doctor'}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             {t('doctorHubSubtitle')}
           </p>
         </div>
@@ -85,56 +85,56 @@ export default function DoctorDashboard() {
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-4 bg-linear-to-br from-white via-white to-amber-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-amber-950/20 border-slate-200/90 dark:border-slate-800 border-t-4 border-t-amber-500 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
-            <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t('patientsAwaitingReview')}</span>
-              <div className="w-8 h-8 rounded-xl bg-amber-100/70 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 flex items-center justify-center shadow-xs">
+          <Card className="p-4 bg-linear-to-br from-white via-white to-amber-50/40 border-slate-200/90 border-t-4 border-t-amber-500 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div className="flex items-center justify-between text-slate-500 mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('patientsAwaitingReview')}</span>
+              <div className="w-8 h-8 rounded-xl bg-amber-100/70 text-amber-800 flex items-center justify-center shadow-xs">
                 <Clock className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+            <div className="text-2xl sm:text-3xl font-bold text-slate-900">
               {data.metrics.patientsAwaitingReview}
             </div>
-            <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium mt-1">Frontline triage queue</p>
+            <p className="text-[11px] text-amber-700 font-medium mt-1">Frontline triage queue</p>
           </Card>
 
-          <Card className="p-4 bg-linear-to-br from-white via-white to-teal-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-teal-950/20 border-slate-200/90 dark:border-slate-800 border-t-4 border-t-teal-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
-            <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t('todayConsultations')}</span>
-              <div className="w-8 h-8 rounded-xl bg-teal-100/70 dark:bg-teal-950/70 text-teal-800 dark:text-teal-300 flex items-center justify-center shadow-xs">
+          <Card className="p-4 bg-linear-to-br from-white via-white to-teal-50/40 border-slate-200/90 border-t-4 border-t-teal-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div className="flex items-center justify-between text-slate-500 mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('todayConsultations')}</span>
+              <div className="w-8 h-8 rounded-xl bg-teal-100/70 text-teal-800 flex items-center justify-center shadow-xs">
                 <Stethoscope className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+            <div className="text-2xl sm:text-3xl font-bold text-slate-900">
               {data.metrics.todayConsultations}
             </div>
-            <p className="text-[11px] text-teal-700 dark:text-teal-400 font-medium mt-1">Confirmed reviews</p>
+            <p className="text-[11px] text-teal-700 font-medium mt-1">Confirmed reviews</p>
           </Card>
 
-          <Card className="p-4 bg-linear-to-br from-white via-white to-indigo-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/20 border-slate-200/90 dark:border-slate-800 border-t-4 border-t-indigo-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
-            <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t('activeReferrals')}</span>
-              <div className="w-8 h-8 rounded-xl bg-indigo-100/70 dark:bg-indigo-950/70 text-indigo-800 dark:text-indigo-300 flex items-center justify-center shadow-xs">
+          <Card className="p-4 bg-linear-to-br from-white via-white to-indigo-50/40 border-slate-200/90 border-t-4 border-t-indigo-600 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div className="flex items-center justify-between text-slate-500 mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('activeReferrals')}</span>
+              <div className="w-8 h-8 rounded-xl bg-indigo-100/70 text-indigo-800 flex items-center justify-center shadow-xs">
                 <Share2 className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+            <div className="text-2xl sm:text-3xl font-bold text-slate-900">
               {data.metrics.activeReferrals}
             </div>
-            <p className="text-[11px] text-indigo-700 dark:text-indigo-400 font-medium mt-1">Active transfers</p>
+            <p className="text-[11px] text-indigo-700 font-medium mt-1">Active transfers</p>
           </Card>
 
-          <Card className="p-4 bg-linear-to-br from-white via-white to-sky-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-sky-950/20 border-slate-200/90 dark:border-slate-800 border-t-4 border-t-sky-500 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
-            <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t('upcomingFollowups')}</span>
-              <div className="w-8 h-8 rounded-xl bg-sky-100/70 dark:bg-sky-950/70 text-sky-800 dark:text-sky-300 flex items-center justify-center shadow-xs">
+          <Card className="p-4 bg-linear-to-br from-white via-white to-sky-50/40 border-slate-200/90 border-t-4 border-t-sky-500 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div className="flex items-center justify-between text-slate-500 mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t('upcomingFollowups')}</span>
+              <div className="w-8 h-8 rounded-xl bg-sky-100/70 text-sky-800 flex items-center justify-center shadow-xs">
                 <CalendarCheck className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+            <div className="text-2xl sm:text-3xl font-bold text-slate-900">
               {data.metrics.upcomingFollowups}
             </div>
-            <p className="text-[11px] text-sky-700 dark:text-sky-400 font-medium mt-1">Scheduled checks</p>
+            <p className="text-[11px] text-sky-700 font-medium mt-1">Scheduled checks</p>
           </Card>
         </div>
       )}
@@ -172,18 +172,18 @@ export default function DoctorDashboard() {
                 <div
                   key={visit._id}
                   className={`p-4 rounded-xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-                    isRed
-                      ? 'bg-red-50/50 border-red-300 border-l-4 border-l-red-500 shadow-xs'
-                      : isYellow
-                      ? 'bg-amber-50/30 border-slate-200 border-l-4 border-l-amber-500 hover:border-amber-300'
-                      : 'bg-white border-slate-200 border-l-4 border-l-emerald-500 hover:border-emerald-300'
-                  }`}
+ isRed
+ ? 'bg-red-50/50 border-red-300 border-l-4 border-l-red-500 shadow-xs'
+ : isYellow
+ ? 'bg-amber-50/30 border-slate-200 border-l-4 border-l-amber-500 hover:border-amber-300'
+ : 'bg-white border-slate-200 border-l-4 border-l-emerald-500 hover:border-emerald-300'
+ }`}
                 >
                   <div className="space-y-1.5 flex-1">
                     <div className="flex flex-wrap items-center gap-2.5">
                       <div className={`w-8 h-8 rounded-full font-bold flex items-center justify-center text-xs shrink-0 ${
-                        isRed ? 'bg-red-200 text-red-900' : isYellow ? 'bg-amber-200 text-amber-900' : 'bg-emerald-100 text-emerald-900'
-                      }`}>
+ isRed ? 'bg-red-200 text-red-900' : isYellow ? 'bg-amber-200 text-amber-900' : 'bg-emerald-100 text-emerald-900'
+ }`}>
                         {p?.name ? p.name[0]?.toUpperCase() : 'P'}
                       </div>
                       <span className="font-bold text-slate-900 text-sm sm:text-base">
